@@ -15,11 +15,15 @@ define("ACTION_NEW_MODULE_PARAM_MODULE", "module");
 define("ACTION_MODIFY_MODULE", "modify_module");
 define("ACTION_MODIFY_MODULE_PARAM_MODULE", "module");
 
-define("ACTION_GET_MODULE", "get_module");
-define("ACTION_GET_MODULE_PARAM_NB_MODULES", "nb_modules");
-
 define("ACTION_DELETE_MODULE", "delete_module");
 define("ACTION_DELETE_MODULE_PARAM_ID", "id");
+
+define("ACTION_PURGE_CLOSED_MODULE", "purge_closed_module");
+
+define("ACTION_GET_MODULE", "get_module");
+define("ACTION_GET_MODULE_PARAM_NB_MODULES", "nb_modules");
+define("ACTION_GET_MODULE_PARAM_OPENED_ONLY", "opened_only");
+define("ACTION_GET_MODULE_PARAM_TYPE", "type");
 
 define("ACTION_NEW_PART", "new_part");
 define("ACTION_NEW_PART_PARAM_PART", "part");

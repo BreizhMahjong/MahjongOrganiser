@@ -2,10 +2,10 @@ var modules;
 
 var elementSelectModule;
 var elementTROptions;
-var elementButtonSave;
 var elementButtonModify;
 var elementButtonDuplicate;
 var elementButtonDelete;
+var elementButtonPurge;
 
 var elementDate;
 var elementTitle;
@@ -168,13 +168,41 @@ function deleteModule() {
 	}
 }
 
+function purgeClosedModules() {
+	if (modules != null && modules.length > 0) {
+		if (confirm("Etes-vous sûr de purger tous les modules fermés ?")) {
+			$.ajax({
+				url: SERVER_QUERY_URL,
+				type: "POST",
+				data: {
+					"action": "purge_closed_module"
+				},
+				success: function(result) {
+					updateResult = $.parseJSON(result);
+					if (updateResult.result) {
+						window.alert("Les modules fermés ont été purgés");
+					} else {
+						window.alert(updateResult.message);
+					}
+					getModules();
+				}
+			});
+		}
+	} else {
+		window.alert("Aucun module");
+	}
+}
+
 function getModules() {
 	showLoading();
 	$.ajax({
 		url: SERVER_QUERY_URL,
 		type: "POST",
 		data: {
-			"action": "get_module"
+			"action": "get_module",
+			"nb_modules": 0,
+			"opened_only": 0,
+			"type": -1
 		},
 		success: function(result) {
 			modules = $.parseJSON(result);
@@ -220,11 +248,13 @@ function prepare() {
 	elementButtonModify = document.getElementById("buttonModify");
 	elementButtonDuplicate = document.getElementById("buttonDuplicate");
 	elementButtonDelete = document.getElementById("buttonDelete");
+	elementButtonPurge = document.getElementById("buttonPurge");
 
 	elementSelectModule.addEventListener("change", displayModule);
 	elementButtonModify.addEventListener("click", modifyModule);
 	elementButtonDuplicate.addEventListener("click", duplicateModule);
 	elementButtonDelete.addEventListener("click", deleteModule);
+	elementButtonPurge.addEventListener("click", purgeClosedModules);
 
 	getModules();
 }

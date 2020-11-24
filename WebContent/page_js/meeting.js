@@ -130,6 +130,12 @@ function deleteComment(moduleIndex, commentIndex) {
 
 function createModuleTable(module, moduleIndex) {
 	var dateOptions = {
+		year: "numeric",
+		month: "long",
+		day: "numeric"
+	};
+
+	var dateTimeOptions = {
 		year: "2-digit",
 		month: "2-digit",
 		day: "2-digit",
@@ -156,8 +162,32 @@ function createModuleTable(module, moduleIndex) {
 		var tableModuleTitleTd = document.createElement("td");
 		tableModuleTitleTr.appendChild(tableModuleTitleTd);
 		tableModuleTitleTd.colSpan = "3";
-		tableModuleTitleTd.style = "width: 100%; padding: 16px";
-		tableModuleTitleTd.innerHTML = module.title;
+
+		var tableModuleTitleInnerDiv = document.createElement("div");
+		tableModuleTitleTd.appendChild(tableModuleTitleInnerDiv);
+		tableModuleTitleInnerDiv.style = "width: 100%";
+
+		var tableModuleTitleInnerTable = document.createElement("table");
+		tableModuleTitleInnerDiv.appendChild(tableModuleTitleInnerTable);
+		tableModuleTitleInnerTable.border = "1px solid gray";
+		tableModuleTitleInnerTable.style = "width: 100%";
+
+		var tableModuleTitleInnerTableBody = document.createElement("tbody");
+		tableModuleTitleInnerTable.appendChild(tableModuleTitleInnerTableBody);
+
+		var tableModuleTitleInnerTableTr = document.createElement("tr");
+		tableModuleTitleInnerTableBody.appendChild(tableModuleTitleInnerTableTr);
+
+		var tableModuleTitleInnerTableDateTd = document.createElement("td");
+		tableModuleTitleInnerTableTr.appendChild(tableModuleTitleInnerTableDateTd);
+		tableModuleTitleInnerTableDateTd.style = "min-width: 239px; max-width: 239px; height: 48px; padding-left: 16px";
+		tableModuleTitleInnerTableDateTd.innerHTML = "Date : " + new Date(module.end_date).toLocaleDateString("fr-fr", dateOptions);
+
+		var titleTextWidth = windowWidth * 8 / 10 - 240 -  2;
+		var tableModuleTitleInnerTableTitleTd = document.createElement("td");
+		tableModuleTitleInnerTableTr.appendChild(tableModuleTitleInnerTableTitleTd);
+		tableModuleTitleInnerTableTitleTd.style = "min-width: " + titleTextWidth + "px; max-width: "  + titleTextWidth + "px; padding: 16px";
+		tableModuleTitleInnerTableTitleTd.innerHTML = module.title;
 	}
 
 	var tableModuleOptionTr = document.createElement("tr");
@@ -166,7 +196,7 @@ function createModuleTable(module, moduleIndex) {
 	{
 		var tableModuleOptionTd = document.createElement("td");
 		tableModuleOptionTr.appendChild(tableModuleOptionTd);
-		tableModuleOptionTd.style = "vertical-align: top; min-width: 390px; max-width:390px";
+		tableModuleOptionTd.style = "vertical-align: top; min-width: 390px; max-width: 390px";
 
 		var tableModuleOptionInnerDiv = document.createElement("div");
 		tableModuleOptionTd.appendChild(tableModuleOptionInnerDiv);
@@ -199,6 +229,7 @@ function createModuleTable(module, moduleIndex) {
 				var tableModulePartInnerTableName = document.createElement("input");
 				tableModulePartInnerTableTd.appendChild(tableModulePartInnerTableName);
 				tableModulePartInnerTableName.type = "text";
+				tableModulePartInnerTableName.maxlength = "16";
 				tableModulePartInnerTableName.style = "width: 100%";
 
 				moduleElement.partName = tableModulePartInnerTableName;
@@ -424,6 +455,7 @@ function createModuleTable(module, moduleIndex) {
 			var tableModuleCommentInnterTableTdNameText = document.createElement("input");
 			tableModuleCommentInnterTableTdName.appendChild(tableModuleCommentInnterTableTdNameText);
 			tableModuleCommentInnterTableTdNameText.type = "text";
+			tableModuleCommentInnterTableTdNameText.maxlength = "16";
 			tableModuleCommentInnterTableTdNameText.style = "width: 100%";
 
 			moduleElement.commentName = tableModuleCommentInnterTableTdNameText;
@@ -441,6 +473,7 @@ function createModuleTable(module, moduleIndex) {
 			var tableModuleCommentInnterTableTdMessageText = document.createElement("input");
 			tableModuleCommentInnterTableTdMessage.appendChild(tableModuleCommentInnterTableTdMessageText);
 			tableModuleCommentInnterTableTdMessageText.type = "text";
+			tableModuleCommentInnterTableTdMessageText.maxlength = "256";
 			tableModuleCommentInnterTableTdMessageText.style = "width: 100%";
 
 			var tableModuleCommentInnterTableTdAdd = document.createElement("td");
@@ -477,7 +510,7 @@ function createModuleTable(module, moduleIndex) {
 			var tableModuleCommentInnterTableTdTime = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdTime);
 			tableModuleCommentInnterTableTdTime.style = "text-align: center; min-width: 150px; max-width: 150px; height: 48px";
-			tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].comment_time) * 1000).toLocaleDateString("fr-fr", dateOptions);
+			tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].comment_time) * 1000).toLocaleDateString("fr-fr", dateTimeOptions);
 
 			var textWidth = windowWidth * 8 / 10 - 450;
 			var tableModuleCommentInnterTableTdMessage = document.createElement("td");
@@ -514,7 +547,9 @@ function getModules() {
 		type: "POST",
 		data: {
 			"action": "get_module",
-			"nb_modules": "5"
+			"nb_modules": 5,
+			"opened_only": 1,
+			"type": 0
 		},
 		success: function(result) {
 			var modulePanel = document.getElementById("modulePanel");

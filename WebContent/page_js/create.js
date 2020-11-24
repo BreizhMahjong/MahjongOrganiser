@@ -1,8 +1,9 @@
 var elementOptions;
 var elementTROptions;
-var elementButtonSave;
+var elementButtonCreate;
 var elementButtonReset;
 
+var elementType;
 var elementDate;
 var elementTitle;
 var elementInputOptions;
@@ -23,6 +24,7 @@ function addModule() {
 
 	var dateDate = elementDate.valueAsDate;
 	var today = new Date();
+	today.setUTCHours(0, 0, 0, 0);
 	if (dateDate.getTime() < today.getTime()) {
 		window.alert("La date choisie est antérieure que la date du jour");
 		return;
@@ -51,6 +53,7 @@ function addModule() {
 	var module = {
 		"title": title,
 		"end_date": date,
+		"type": elementType.options[elementType.selectedIndex].value,
 		"options": options
 	}
 
@@ -84,6 +87,7 @@ function reset() {
 }
 
 function prepare() {
+	elementType = document.getElementById("moduleType");
 	elementDate = document.getElementById("moduleDate");
 	elementTitle = document.getElementById("moduleTitle");
 	elementInputOptions = new Array();
@@ -107,11 +111,11 @@ function prepare() {
 	elementTROptions.push(document.getElementById("optionLine7"));
 	elementTROptions.push(document.getElementById("optionLine8"));
 
-	elementButtonSave = document.getElementById("buttonSave");
+	elementButtonCreate = document.getElementById("buttonCreate");
 	elementButtonReset = document.getElementById("buttonReset");
 
 	elementOptions.addEventListener("change", toggleOptions);
-	elementButtonSave.addEventListener("click", addModule);
+	elementButtonCreate.addEventListener("click", addModule);
 	elementButtonReset.addEventListener("click", reset);
 }
 

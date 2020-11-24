@@ -10,6 +10,7 @@ define ("COOKIE_EXPIRE_TIME", 86400);
 define ("MODULE_ID", "id");
 define ("MODULE_TITLE", "title");
 define ("MODULE_END_DATE", "end_date");
+define ("MODULE_TYPE", "type");
 define ("MODULE_OPTIONS", "options");
 define ("MODULE_PARTS", "parts");
 define ("MODULE_COMMENTS", "comments");

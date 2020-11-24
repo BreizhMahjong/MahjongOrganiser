@@ -1,8 +1,8 @@
 CREATE TABLE bmjs_module (
 	id				integer unsigned not null auto_increment,
-	title			varchar(256) not null,
+	title			varchar(128) not null,
 	end_date		date,
-	nb_options		tinyint unsigned not null,
+	type			tinyint unsigned not null default 0,
 	constraint		module_pk primary key(id)
 );
 

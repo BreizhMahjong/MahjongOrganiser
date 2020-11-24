@@ -11,8 +11,8 @@ $action = isset($_POST[ACTION]) ? $_POST[ACTION] : null;
 $user = isset($_SERVER["PHP_AUTH_USER"]) ? $_POST["PHP_AUTH_USER"] : null;
 $password = isset($_SERVER["PHP_AUTH_PW"]) ? $_POST["PHP_AUTH_PW"] : null;
 
-if ($action !== null) {
-	switch ($action) {
+if($action !== null) {
+	switch($action) {
 		case ACTION_LOGIN:
 			$userName = isset($_POST[ACTION_LOGIN_PARAM_USER]) ? $_POST[ACTION_LOGIN_PARAM_USER] : null;
 			$password = isset($_POST[ACTION_LOGIN_PARAM_PASSWORD]) ? $_POST[ACTION_LOGIN_PARAM_PASSWORD] : null;
@@ -33,13 +33,14 @@ if ($action !== null) {
 			$id = isset($_POST[ACTION_DELETE_MODULE_PARAM_ID]) ? $_POST[ACTION_DELETE_MODULE_PARAM_ID] : null;
 			echo delete_module($id);
 			break;
+		case ACTION_PURGE_CLOSED_MODULE:
+			echo purge_closed_module();
+			break;
 		case ACTION_GET_MODULE:
-			$nb_modules = isset($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) ? $_POST[ACTION_GET_MODULE_PARAM_NB_MODULES] : null;
-			if ($nb_modules == null) {
-				echo get_module(0);
-			} else {
-				echo get_module($nb_modules);
-			}
+			$nb_modules = isset($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) ? intval($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) : null;
+			$opened_only = isset($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) ? boolval($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) : null;
+			$type = isset($_POST[ACTION_GET_MODULE_PARAM_TYPE]) ? intval($_POST[ACTION_GET_MODULE_PARAM_TYPE]) : null;
+			echo get_module($nb_modules, $opened_only, $type);
 			break;
 		case ACTION_NEW_PART:
 			$part = isset($_POST[ACTION_NEW_PART_PARAM_PART]) ? $_POST[ACTION_NEW_PART_PARAM_PART] : null;

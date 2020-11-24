@@ -14,14 +14,11 @@ session_start();
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- DataTables -->
-<link rel="stylesheet" type="text/css"
-	href="lib/DataTables/datatables.min.css" />
+<link rel="stylesheet" type="text/css" href="lib/DataTables/datatables.min.css" />
 
 <!-- Select2 -->
-<link rel="stylesheet" type="text/css"
-	href="lib/select2-4.0.2/css/select2.min.css" />
-<link rel="stylesheet" type="text/css"
-	href="lib/select2-4.0.2/css/select2-bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="lib/select2-4.0.2/css/select2.min.css" />
+<link rel="stylesheet" type="text/css" href="lib/select2-4.0.2/css/select2-bootstrap.min.css" />
 
 <!-- Custom CSS -->
 <link href="css/style.css" rel="stylesheet">
@@ -38,10 +35,10 @@ session_start();
 require_once ("db_php/query_common.php");
 require_once ("db_php/query_login_logout.php");
 
-if (isset($_COOKIE[COOKIE_NAME_ID])) {
+if(isset($_COOKIE[COOKIE_NAME_ID])) {
 	decryptCookie($_COOKIE[COOKIE_NAME_ID]);
 	$isLogin = isset($_SESSION[SESSION_LOG_IN_ID]);
-	if ($isLogin) {
+	if($isLogin) {
 		$loginId = $_SESSION[SESSION_LOG_IN_ID];
 		$isAdmin = $_SESSION[SESSION_IS_ADMIN];
 	} else {
@@ -54,13 +51,17 @@ if (isset($_COOKIE[COOKIE_NAME_ID])) {
 	$isAdmin = false;
 }
 
-if (isset($_GET["menu"])) {
+if(isset($_GET["menu"])) {
 	$menu = $_GET["menu"];
-	if (! $isAdmin || ($menu !== "creation" && $menu !== "modification" && $menu !== "participation")) {
-		$menu = "participation";
+	if(!$isLogin && $menu !== "meeting") {
+		$menu = "meeting";
+	} else if(!$isAdmin && $menu !== "event" && $menu !== "meeting") {
+		$menu = "meeting";
+	} else if($isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "event" && $menu !== "meeting") {
+		$menu = "meeting";
 	}
 } else {
-	$menu = "participation";
+	$menu = "meeting";
 }
 ?>
 	<script type="text/javascript">
@@ -72,44 +73,54 @@ if (isset($_GET["menu"])) {
 			<div class="container-fluid">
 				<!-- Brand and toggle get grouped for better mobile display -->
 				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed"
-						data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-						aria-expanded="false">
-						<span class="sr-only">Toggle navigation</span> <span
-							class="icon-bar"></span> <span class="icon-bar"></span> <span
-							class="icon-bar"></span>
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="/bmjo"> <img
-						src="images/logo_render_small.png" />
+					<a class="navbar-brand" href="/bmjo"> <img src="images/logo_render_small.png" />
 					</a>
 				</div>
 				<!-- Collect the nav links, forms, and other content for toggling -->
-				<div class="collapse navbar-collapse"
-					id="bs-example-navbar-collapse-1">
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
 						<?php
-						if ($isAdmin) {
-							if ($menu === "creation") {
-								echo "<li class=\"active\"><a href=\"?menu=creation\">Création</a></li>";
-								echo "<li><a href=\"?menu=modification\">Modification</a></li>";
-								echo "<li><a href=\"?menu=participation\">Participation</a></li>";
-							} else if ($menu === "modification") {
-								echo "<li><a href=\"?menu=creation\">Création</a></li>";
-								echo "<li class=\"active\"><a href=\"?menu=modification\">Modification</a></li>";
-								echo "<li><a href=\"?menu=participation\">Participation</a></li>";
-							} else if ($menu === "participation") {
-								echo "<li><a href=\"?menu=creation\">Création</a></li>";
-								echo "<li><a href=\"?menu=create\">Modification</a></li>";
-								echo "<li class=\"active\"><a href=\"?menu=participation\">Participation</a></li>";
+						if($isAdmin) {
+							if($menu === "create") {
+								echo "<li class=\"active\"><a href=\"?menu=create\">Créer</a></li>";
+								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "modify") {
+								echo "<li><a href=\"?menu=create\">Créer</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "event") {
+								echo "<li><a href=\"?menu=create\">Créer</a></li>";
+								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "meeting") {
+								echo "<li><a href=\"?menu=create\">Créer</a></li>";
+								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
+							}
+						} else if($isLogin) {
+							if($menu === "event") {
+								echo "<li class=\"active\"><a href=\"?menu=event\">Evenement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "meeting") {
+								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
 						} else {
-							echo "<li class=\"active\"><a href=\"?menu=participation\">Participation</a></li>";
+							echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 						}
 						?>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<?php
-						if ($isLogin) {
+						if($isLogin) {
 							?>
 						<li><img class="navbar-brand"
 							src="<?php
@@ -117,30 +128,26 @@ if (isset($_GET["menu"])) {
 							$avatarPath2 = '../wp-content/uploads/ultimatemember/' . $loginId . '/profile_photo-40.jpg';
 							$avatarPath3 = '../wp-content/uploads/ultimatemember/' . $loginId . '/profile_photo-40x40.png';
 							$avatarPath4 = '../wp-content/uploads/ultimatemember/' . $loginId . '/profile_photo-40.png';
-							if (file_exists($avatarPath1)) {
+							if(file_exists($avatarPath1)) {
 								echo $avatarPath1;
-							} else if (file_exists($avatarPath2)) {
+							} else if(file_exists($avatarPath2)) {
 								echo $avatarPath2;
-							} else if (file_exists($avatarPath3)) {
+							} else if(file_exists($avatarPath3)) {
 								echo $avatarPath3;
-							} else if (file_exists($avatarPath4)) {
+							} else if(file_exists($avatarPath4)) {
 								echo $avatarPath4;
 							} else {
 								echo "../wp-content/uploads/2018/07/ouest-riichi.png";
 							}
 							?>" /></li>
-						<li><button id="logoutButton" type="button"
-								class="btn btn-default navbar-btn" onclick="logoutEvent()">
-								<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-								Déconnexion
+						<li><button id="logoutButton" type="button" class="btn btn-default navbar-btn" onclick="logoutEvent()">
+								<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Déconnexion
 							</button></li>
 						<?php
 						} else {
 							?>
-						<li><button id="loginButton" href="#modal" type="button"
-								class="btn btn-success navbar-btn">
-								<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-								Connexion
+						<li><button id="loginButton" href="#modal" type="button" class="btn btn-success navbar-btn">
+								<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Connexion
 							</button></li>
 						<?php
 						}
@@ -157,32 +164,25 @@ if (isset($_GET["menu"])) {
 	</div>
 	<footer>
 		<p align="center">
-			Authors : Pierric Willemet, Yulong Zhao @ <a
-				href="https://breizhmahjong.fr/">Breizh Mahjong</a>
-	
+			Authors : Pierric Willemet, Yulong Zhao @ <a href="https://breizhmahjong.fr/">Breizh Mahjong</a>
 	</footer>
 	<div id="modal" class="popupContainer">
 		<header class="popupHeader">
-			<span class="header_title">Authentification</span> <span
-				class="modal_close"><span class="glyphicon glyphicon-remove"></span></span>
+			<span class="header_title">Authentification</span> <span class="modal_close"><span class="glyphicon glyphicon-remove"></span></span>
 		</header>
 		<section class="popupBody">
 			<form id="loginForm">
 				<p id="loginError"></p>
 				<label for="loginInput">Identifiant : </label>
 				<div class="input-group">
-					<input id="loginInput" type="text" class="form-control"
-						aria-describedby="basic-addon2" />
+					<input id="loginInput" type="text" class="form-control" aria-describedby="basic-addon2" />
 				</div>
 				<br /> <label for="passwordInput">Mot de passe : </label>
 				<div class="input-group">
-					<input id="passwordInput" type="password" class="form-control"
-						aria-describedby="basic-addon2" />
+					<input id="passwordInput" type="password" class="form-control" aria-describedby="basic-addon2" />
 				</div>
 				<br />
-				<button id="validateLoginButton" type="button"
-					class="btn btn-primary" onclick="loginEvent()"
-					aria-label="Left Align">Se connecter</button>
+				<button id="validateLoginButton" type="button" class="btn btn-primary" onclick="loginEvent()" aria-label="Left Align">Se connecter</button>
 			</form>
 		</section>
 	</div>
@@ -191,8 +191,7 @@ if (isset($_GET["menu"])) {
 	<script src="lib/jquery.leanModal.min.js"></script>
 	<script src="lib/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="lib/DataTables/datatables.min.js"></script>
-	<script type="text/javascript"
-		src="lib/select2-4.0.2/js/select2.min.js"></script>
+	<script type="text/javascript" src="lib/select2-4.0.2/js/select2.min.js"></script>
 	<script src="page_js/main.js"></script>
 	<script src="page_js/<?php echo $menu;?>.js"></script>
 </body>
