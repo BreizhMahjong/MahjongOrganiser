@@ -549,7 +549,7 @@ function getModules() {
 			"action": "get_module",
 			"nb_modules": 5,
 			"opened_only": 1,
-			"type": 0
+			"type": moduleTypeConst
 		},
 		success: function(result) {
 			var modulePanel = document.getElementById("modulePanel");
