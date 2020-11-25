@@ -1,4 +1,4 @@
-<table style="width: 864px">
+<table style="border: 0px; width: 864px">
 	<tr>
 		<td style="text-align: right; width: 144px; padding: 8px">Type :</td>
 		<td style="text-align: center; width: 144px; padding: 8px"><select style="width: 128px" id="moduleType">
@@ -24,7 +24,7 @@
 		<td colspan="5" style="text-align: center; width: 720px; padding: 8px"><input style="width: 100%" id="moduleTitle" type="text" maxlength="128"></td>
 	</tr>
 </table>
-<table style="width: 576px; margin-bottom: 32px">
+<table style="border: 0px; width: 576px; margin-bottom: 32px">
 	<tr style="display: table-row" id="optionLine1">
 		<td style="text-align: right; width: 25%; padding: 8px">Option 1 :</td>
 		<td style="text-align: center; width: 75%; padding: 8px"><input style="width: 100%" id="moduleOption1" type="text" maxlength="32"></td>
@@ -58,7 +58,7 @@
 		<td style="text-align: center; width: 75%; padding: 8px"><input style="width: 100%" id="moduleOption8" type="text" maxlength="32"></td>
 	</tr>
 </table>
-<table style="width: 576px">
+<table style="border: 0px; width: 576px">
 	<tr>
 		<td style="width: 20%"></td>
 		<td style="width: 20%"><input style="width: 100%" id="buttonCreate" type="button" value="Créer"></td>

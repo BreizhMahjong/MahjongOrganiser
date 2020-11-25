@@ -144,6 +144,7 @@ if(isset($_GET["menu"])) {
 	<footer>
 		<p align="center">
 			Authors : Pierric Willemet, Yulong Zhao @ <a href="https://breizhmahjong.fr/">Breizh Mahjong</a>
+
 	</footer>
 
 	<div id="modal" class="popupContainer">

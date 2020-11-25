@@ -147,6 +147,15 @@ body {
 	}
 }
 
-.table>tbody>tr>td {
-	vertical-align: middle;
+table {
+	border: 1px solid grey;
+	border-collapse: collapse;
+}
+
+td#title {
+	border: 1px solid grey;
+}
+
+td {
+	border: 0;
 }

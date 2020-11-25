@@ -1,4 +1,4 @@
-<table style="width: 864px; margin-bottom: 32px">
+<table style="border: 0px; width: 864px; margin-bottom: 32px">
 	<tr>
 		<td style="text-align: right; width: 144px; padding: 8px">Module :</td>
 		<td colspan="5" style="width: 720px; padding: 8px"><select id="selectModule" style="width: 100%;"></select></td>
@@ -64,7 +64,7 @@
 		<td/>
 	</tr>
 </table>
-<table style="width: 576px">
+<table style="border: 0px; width: 576px">
 	<tr>
 		<td style="width: 20%"></td>
 		<td style="width: 20%"><input style="width: 100%" id="buttonModify" type="button" value="Modifier"></td>

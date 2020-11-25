@@ -148,8 +148,25 @@ function createModuleTable(module, moduleIndex) {
 	var index, index2;
 	var moduleElement = new Object();
 
+	var participations = new Array();
+	var participationsOption = new Array();
+	for (index = 0; index < module.options.length; index++) {
+		var mask = 1 << index;
+		var participation = new Array();
+		var participationOption = 0;
+		for (index2 = 0; index2 < module.parts.length; index2++) {
+			if ((module.parts[index2].participation & mask) > 0) {
+				participation.push(1);
+				participationOption++;
+			} else {
+				participation.push(0);
+			}
+		}
+		participations.push(participation);
+		participationsOption.push(participationOption);
+	}
+
 	var tableModule = document.createElement("table");
-	tableModule.border = "2px solid gray";
 	tableModule.style = "margin-left: 10%; margin-right: 10%; margin-bottom: 60px; min-width: 80%; max-width: 80%; width: 80%";
 
 	var tableModuleBody = document.createElement("tbody");
@@ -159,150 +176,136 @@ function createModuleTable(module, moduleIndex) {
 	tableModuleBody.appendChild(tableModuleTitleTr);
 
 	{
-		var tableModuleTitleTd = document.createElement("td");
-		tableModuleTitleTr.appendChild(tableModuleTitleTd);
-		tableModuleTitleTd.colSpan = "3";
+		var tableModuleTitleDateTd = document.createElement("td");
+		tableModuleTitleTr.appendChild(tableModuleTitleDateTd);
+		tableModuleTitleDateTd.id = "title";
+		tableModuleTitleDateTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px";
+		tableModuleTitleDateTd.innerHTML = "Date : " + new Date(module.end_date).toLocaleDateString("fr-fr", dateOptions);
 
-		var tableModuleTitleInnerDiv = document.createElement("div");
-		tableModuleTitleTd.appendChild(tableModuleTitleInnerDiv);
-		tableModuleTitleInnerDiv.style = "width: 100%";
-
-		var tableModuleTitleInnerTable = document.createElement("table");
-		tableModuleTitleInnerDiv.appendChild(tableModuleTitleInnerTable);
-		tableModuleTitleInnerTable.border = "1px solid gray";
-		tableModuleTitleInnerTable.style = "width: 100%";
-
-		var tableModuleTitleInnerTableBody = document.createElement("tbody");
-		tableModuleTitleInnerTable.appendChild(tableModuleTitleInnerTableBody);
-
-		var tableModuleTitleInnerTableTr = document.createElement("tr");
-		tableModuleTitleInnerTableBody.appendChild(tableModuleTitleInnerTableTr);
-
-		var tableModuleTitleInnerTableDateTd = document.createElement("td");
-		tableModuleTitleInnerTableTr.appendChild(tableModuleTitleInnerTableDateTd);
-		tableModuleTitleInnerTableDateTd.style = "min-width: 239px; max-width: 239px; height: 48px; padding-left: 16px";
-		tableModuleTitleInnerTableDateTd.innerHTML = "Date : " + new Date(module.end_date).toLocaleDateString("fr-fr", dateOptions);
-
-		var titleTextWidth = windowWidth * 8 / 10 - 240 -  2;
-		var tableModuleTitleInnerTableTitleTd = document.createElement("td");
-		tableModuleTitleInnerTableTr.appendChild(tableModuleTitleInnerTableTitleTd);
-		tableModuleTitleInnerTableTitleTd.style = "min-width: " + titleTextWidth + "px; max-width: "  + titleTextWidth + "px; padding: 16px";
-		tableModuleTitleInnerTableTitleTd.innerHTML = module.title;
+		var titleTextWidth = windowWidth * 8 / 10 - 240;
+		var tableModuleTitleTitleTd = document.createElement("td");
+		tableModuleTitleTr.appendChild(tableModuleTitleTitleTd);
+		tableModuleTitleTitleTd.id = "title";
+		tableModuleTitleTitleTd.colSpan = "3";
+		tableModuleTitleTitleTd.style = "min-width: " + titleTextWidth + "px; max-width: " + titleTextWidth + "px; padding: 16px";
+		tableModuleTitleTitleTd.innerHTML = module.title;
 	}
 
-	var tableModuleOptionTr = document.createElement("tr");
-	tableModuleBody.appendChild(tableModuleOptionTr);
+	var tableModuleOptionTitleTr = document.createElement("tr");
+	tableModuleBody.appendChild(tableModuleOptionTitleTr);
 
 	{
-		var tableModuleOptionTd = document.createElement("td");
-		tableModuleOptionTr.appendChild(tableModuleOptionTd);
-		tableModuleOptionTd.style = "vertical-align: top; min-width: 390px; max-width: 390px";
+		var tableModuleOptionPartTd = document.createElement("td");
+		tableModuleOptionTitleTr.appendChild(tableModuleOptionPartTd);
+		tableModuleOptionPartTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px";
 
-		var tableModuleOptionInnerDiv = document.createElement("div");
-		tableModuleOptionTd.appendChild(tableModuleOptionInnerDiv);
-		tableModuleOptionInnerDiv.style = "width: 100%";
+		var tableModuleOptionTotalTd = document.createElement("td");
+		tableModuleOptionTitleTr.appendChild(tableModuleOptionTotalTd);
+		tableModuleOptionTotalTd.align = "center"
+		tableModuleOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px";
 
-		var tableModuleOptionInnerTable = document.createElement("table");
-		tableModuleOptionInnerDiv.appendChild(tableModuleOptionInnerTable);
-		tableModuleOptionInnerTable.border = "1px solid gray";
-		tableModuleOptionInnerTable.style = "width: 100%";
+		var tableModuleOptionNewPartTd = document.createElement("td");
+		tableModuleOptionTitleTr.appendChild(tableModuleOptionNewPartTd);
+		tableModuleOptionNewPartTd.align = "center"
+		tableModuleOptionNewPartTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
 
-		var tableModuleOptionInnerTableBody = document.createElement("tbody");
-		tableModuleOptionInnerTable.appendChild(tableModuleOptionInnerTableBody);
+		var tableModuleOptionNewPart = document.createElement("input");
+		tableModuleOptionNewPartTd.appendChild(tableModuleOptionNewPart);
+		tableModuleOptionNewPart.type = "text";
+		tableModuleOptionNewPart.maxlength = "16";
+		tableModuleOptionNewPart.style = "width: 100%";
 
-		{
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
-			{
-				var tableModuleOptionInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModuleOptionInnerTableTd);
-				tableModuleOptionInnerTableTd.style = "min-width: 239px; max-width: 239px; height: 48px; padding-left: 16px";
-				tableModuleOptionInnerTableTd.innerHTML = "Participants";
-			}
+		moduleElement.partName = tableModuleOptionNewPart;
+	}
 
-			{
-				var tableModulePartInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-				tableModulePartInnerTableTd.align = "center"
-				tableModulePartInnerTableTd.style = "min-width: 149px; max-width: 149px; height: 48px; padding-left: 16px; padding-right: 16px";
+	var tableModulePartTd = document.createElement("td");
+	tableModuleOptionTitleTr.appendChild(tableModulePartTd);
+	tableModulePartTd.rowSpan = module.options.length + 3;
 
-				var tableModulePartInnerTableName = document.createElement("input");
-				tableModulePartInnerTableTd.appendChild(tableModulePartInnerTableName);
-				tableModulePartInnerTableName.type = "text";
-				tableModulePartInnerTableName.maxlength = "16";
-				tableModulePartInnerTableName.style = "width: 100%";
-
-				moduleElement.partName = tableModulePartInnerTableName;
-			}
-		}
-
-		var moduleElementOptions = new Array();
-		for (index = 0; index < module.options.length; index++) {
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
-
-			{
-				var tableModuleOptionInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModuleOptionInnerTableTd);
-				tableModuleOptionInnerTableTd.style = "min-width: 239px; max-width: 239px; height: 48px; padding-left: 16px; overflow-x: hidden";
-				tableModuleOptionInnerTableTd.innerHTML = module.options[index].title;
-			}
-
-			{
-				var tableModulePartInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-				tableModulePartInnerTableTd.align = "center"
-				tableModulePartInnerTableTd.style = "min-width: 149px; max-width: 149px; height: 48px; padding-left: 16px; padding-right: 16px";
-
-				var tableModulePartInnerTablePart = document.createElement("input");
-				tableModulePartInnerTableTd.appendChild(tableModulePartInnerTablePart);
-				tableModulePartInnerTablePart.type = "checkbox";
-
-				moduleElementOptions.push(tableModulePartInnerTablePart);
-			}
-		}
-		moduleElement.options = moduleElementOptions;
+	var moduleElementOptions = new Array();
+	for (index = 0; index < module.options.length; index++) {
+		var tableModuleOptionTr = document.createElement("tr");
+		tableModuleBody.appendChild(tableModuleOptionTr);
 
 		{
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
+			var tableModuleOptionOptionTitleTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionTitleTd);
+			tableModuleOptionOptionTitleTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px; overflow-x: hidden";
+			tableModuleOptionOptionTitleTd.innerHTML = module.options[index].title;
+		}
 
-			{
-				var tableModuleOptionInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModuleOptionInnerTableTd);
-				tableModuleOptionInnerTableTd.style = "height: 48px; padding-left: 16px";
-			}
-			{
-				var tableModulePartInnerTableTd = document.createElement("td");
-				tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-				tableModulePartInnerTableTd.align = "center"
-				tableModulePartInnerTableTd.style = "height: 48px; padding-left: 16px; padding-right: 16px";
+		{
+			var tableModuleOptionOptionTotalTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionTotalTd);
+			tableModuleOptionOptionTotalTd.align = "center"
+			tableModuleOptionOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleOptionOptionTotalTd.innerHTML = participationsOption[index].toString();
+		}
 
-				var tableModulePartInnerTableIcon = document.createElement("img");
-				tableModulePartInnerTableTd.appendChild(tableModulePartInnerTableIcon);
-				tableModulePartInnerTableIcon.src = "images/plus.png";
-				tableModulePartInnerTableIcon.width = "16";
-				tableModulePartInnerTableIcon.height = "16";
-				tableModulePartInnerTableIcon.addEventListener("click", (function(constModuleIndex) {
-					return function() {
-						addParticipation(constModuleIndex);
-					}
-				})(moduleIndex));
-			}
+		{
+			var tableModuleOptionOptionInputTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionInputTd);
+			tableModuleOptionOptionInputTd.align = "center"
+			tableModuleOptionOptionInputTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+
+			var tableModuleOptionOptionInput = document.createElement("input");
+			tableModuleOptionOptionInputTd.appendChild(tableModuleOptionOptionInput);
+			tableModuleOptionOptionInput.type = "checkbox";
+
+			moduleElementOptions.push(tableModuleOptionOptionInput);
+		}
+	}
+	moduleElement.options = moduleElementOptions;
+
+	{
+		var tableModuleOptionTr = document.createElement("tr");
+		tableModuleBody.appendChild(tableModuleOptionTr);
+		{
+			var tableModuleOptionOptionTitleTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionTitleTd);
+			tableModuleOptionOptionTitleTd.style = "min-width: 240px; max-width: 240px; height: 48px";
+		}
+
+		{
+			var tableModuleOptionOptionTotalTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionTotalTd);
+			tableModuleOptionOptionTotalTd.align = "center"
+			tableModuleOptionOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px";
+		}
+
+		{
+			var tableModuleOptionOptionInputTd = document.createElement("td");
+			tableModuleOptionTr.appendChild(tableModuleOptionOptionInputTd);
+			tableModuleOptionOptionInputTd.align = "center"
+			tableModuleOptionOptionInputTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+
+			var tableModuleOptionOptionInputIcon = document.createElement("img");
+			tableModuleOptionOptionInputTd.appendChild(tableModuleOptionOptionInputIcon);
+			tableModuleOptionOptionInputIcon.src = "images/plus.png";
+			tableModuleOptionOptionInputIcon.width = "16";
+			tableModuleOptionOptionInputIcon.height = "16";
+			tableModuleOptionOptionInputIcon.addEventListener("click", (function(constModuleIndex) {
+				return function() {
+					addParticipation(constModuleIndex);
+				}
+			})(moduleIndex));
 		}
 	}
 
-	var participationsOption = new Array();
 	{
-		var tableModuleMemberTd = document.createElement("td");
-		tableModuleOptionTr.appendChild(tableModuleMemberTd);
+		var tableModuleOptionTr = document.createElement("tr");
+		tableModuleBody.appendChild(tableModuleOptionTr);
 
-		var tableModuleMemberInnerDiv = document.createElement("div");
-		tableModuleMemberTd.appendChild(tableModuleMemberInnerDiv);
+		var tableModuleOptionVoidTd = document.createElement("td");
+		tableModuleOptionTr.appendChild(tableModuleOptionVoidTd);
+		tableModuleOptionVoidTd.colSpan = "3";
+		tableModuleOptionVoidTd.style = "height: 19px";
+	}
 
+	{
 		var tableModuleMemberInnerTable = document.createElement("table");
-		tableModuleMemberInnerDiv.appendChild(tableModuleMemberInnerTable);
-		tableModuleMemberInnerTable.border = "1px solid gray";
+		tableModulePartTd.appendChild(tableModuleMemberInnerTable);
+		tableModuleMemberInnerTable.style = "border: 0; width: 100%";
 
 		var tableModuleMemberInnerTableBody = document.createElement("tbody");
 		tableModuleMemberInnerTable.appendChild(tableModuleMemberInnerTableBody);
@@ -317,9 +320,9 @@ function createModuleTable(module, moduleIndex) {
 			tableModuleMemberInnerTableBody.appendChild(tableModuleMemberInnerTableTr);
 
 			for (index = 0; index < module.parts.length; index++) {
-				var tableModuleMemberInnerTableTd = document.createElement("th");
+				var tableModuleMemberInnerTableTd = document.createElement("td");
 				tableModuleMemberInnerTableTr.appendChild(tableModuleMemberInnerTableTd);
-				tableModuleMemberInnerTableTd.style = "text-align: center; min-width: 148px; max-width: 148px; height: 48px; padding-left: 16px; padding-right: 16px";
+				tableModuleMemberInnerTableTd.style = "text-align: center; min-width: 150px; max-width: 150px; height: 48px";
 				tableModuleMemberInnerTableTd.innerHTML = module.parts[index].name;
 
 				moduleElementParts.push(module.parts[index].name);
@@ -327,12 +330,10 @@ function createModuleTable(module, moduleIndex) {
 			moduleElement.parts = moduleElementParts;
 		}
 
-		var mask = 1;
 		for (index = 0; index < module.options.length; index++) {
 			var tableModuleMemberInnerTableTr = document.createElement("tr");
 			tableModuleMemberInnerTableBody.appendChild(tableModuleMemberInnerTableTr);
 
-			var participationOption = 0;
 			for (index2 = 0; index2 < module.parts.length; index2++) {
 				var tableModuleMemberInnerTableTd = document.createElement("td");
 				tableModuleMemberInnerTableTr.appendChild(tableModuleMemberInnerTableTd);
@@ -343,16 +344,12 @@ function createModuleTable(module, moduleIndex) {
 				tableModuleMemberInnerTableTd.appendChild(tableModuleMemberInnerTableTdIcon);
 				tableModuleMemberInnerTableTdIcon.width = "16";
 				tableModuleMemberInnerTableTdIcon.height = "16";
-				if ((module.parts[index2].participation & mask) > 0) {
+				if (participations[index][index2] == 1) {
 					tableModuleMemberInnerTableTdIcon.src = "images/checked.png";
-					participationOption++;
 				} else {
 					tableModuleMemberInnerTableTdIcon.src = "images/unchecked.png";
 				}
 			}
-			participationsOption.push(participationOption);
-
-			mask = mask << 1;
 		}
 
 		{
@@ -379,65 +376,16 @@ function createModuleTable(module, moduleIndex) {
 		}
 	}
 
-	{
-		var tableModuleOptionTd = document.createElement("td");
-		tableModuleOptionTr.appendChild(tableModuleOptionTd);
-		tableModuleOptionTd.style = "vertical-align: top; min-width: 60px; max-width:60px";
-
-		var tableModuleOptionInnerDiv = document.createElement("div");
-		tableModuleOptionTd.appendChild(tableModuleOptionInnerDiv);
-		tableModuleOptionInnerDiv.style = "width: 100%";
-
-		var tableModuleOptionInnerTable = document.createElement("table");
-		tableModuleOptionInnerDiv.appendChild(tableModuleOptionInnerTable);
-		tableModuleOptionInnerTable.border = "1px solid gray";
-		tableModuleOptionInnerTable.style = "width: 100%";
-
-		var tableModuleOptionInnerTableBody = document.createElement("tbody");
-		tableModuleOptionInnerTable.appendChild(tableModuleOptionInnerTableBody);
-
-		{
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
-
-			var tableModulePartInnerTableTd = document.createElement("td");
-			tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-			tableModulePartInnerTableTd.align = "center"
-			tableModulePartInnerTableTd.style = "min-width: 100%; max-width: 100%; height: 48px";
-			tableModulePartInnerTableTd.innerHTML = "Total";
-		}
-
-		for (index = 0; index < module.options.length; index++) {
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
-
-			var tableModulePartInnerTableTd = document.createElement("td");
-			tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-			tableModulePartInnerTableTd.align = "center"
-			tableModulePartInnerTableTd.style = "height: 48px; padding-left: 16px; padding-right: 16px";
-			tableModulePartInnerTableTd.innerHTML = participationsOption[index].toString();
-		}
-
-		{
-			var tableModuleOptionInnerTableTr = document.createElement("tr");
-			tableModuleOptionInnerTableBody.appendChild(tableModuleOptionInnerTableTr);
-
-			var tableModulePartInnerTableTd = document.createElement("td");
-			tableModuleOptionInnerTableTr.appendChild(tableModulePartInnerTableTd);
-			tableModulePartInnerTableTd.align = "center"
-			tableModulePartInnerTableTd.style = "height: 48px; padding-left: 16px; padding-right: 16px";
-		}
-	}
-
 	var tableModuleCommentTr = document.createElement("tr");
 	tableModuleBody.appendChild(tableModuleCommentTr);
 
 	var tableModuleCommentTd = document.createElement("td");
 	tableModuleCommentTr.appendChild(tableModuleCommentTd);
-	tableModuleCommentTd.colSpan = "3";
+	tableModuleCommentTd.colSpan = "4";
 	{
 		var tableModuleCommentInnerTable = document.createElement("table");
 		tableModuleCommentTd.appendChild(tableModuleCommentInnerTable);
+		tableModuleCommentInnerTable.style = "border: 0px; width: 100%";
 
 		{
 			var tableModuleCommentInnterTableTr = document.createElement("tr");
@@ -445,12 +393,12 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
-			tableModuleCommentInnterTableTdNameTitle.style = "border-bottom: 1px solid grey; text-align: right; min-width: 90px; max-width: 90px; height: 48px";
+			tableModuleCommentInnterTableTdNameTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; min-width: 90px; max-width: 90px; height: 48px";
 			tableModuleCommentInnterTableTdNameTitle.innerHTML = "Votre nom: ";
 
 			var tableModuleCommentInnterTableTdName = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
-			tableModuleCommentInnterTableTdName.style = "border-bottom: 1px solid grey; min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleCommentInnterTableTdName.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdNameText = document.createElement("input");
 			tableModuleCommentInnterTableTdName.appendChild(tableModuleCommentInnterTableTdNameText);
@@ -462,13 +410,13 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdMessageTitle = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessageTitle);
-			tableModuleCommentInnterTableTdMessageTitle.style = "border-bottom: 1px solid grey; text-align: right; min-width: 150px; max-width: 150px; height: 48px; padding-right: 8px";
+			tableModuleCommentInnterTableTdMessageTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; min-width: 150px; max-width: 150px; height: 48px; padding-right: 8px";
 			tableModuleCommentInnterTableTdMessageTitle.innerHTML = "Votre message: ";
 
-			var textWidth = windowWidth * 8 / 10 - 450 + 3;
+			var textWidth = windowWidth * 8 / 10 - 450;
 			var tableModuleCommentInnterTableTdMessage = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
-			tableModuleCommentInnterTableTdMessage.style = "border-bottom: 1px solid grey; min-width: " + textWidth + "px; max-width: " + textWidth + "px; height: 48px; padding-left: 8px; padding-right: 16px";
+			tableModuleCommentInnterTableTdMessage.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; min-width: " + textWidth + "px; max-width: " + textWidth + "px; height: 48px; padding-left: 8px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdMessageText = document.createElement("input");
 			tableModuleCommentInnterTableTdMessage.appendChild(tableModuleCommentInnterTableTdMessageText);
@@ -478,7 +426,7 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdAdd = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdAdd);
-			tableModuleCommentInnterTableTdAdd.style = "border-bottom: 1px solid grey; text-align: center; min-width: 60px; max-width: 60px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleCommentInnterTableTdAdd.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: center; min-width: 60px; max-width: 60px; height: 48px; padding-left: 16px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdAddIcon = document.createElement("img");
 			tableModuleCommentInnterTableTdAdd.appendChild(tableModuleCommentInnterTableTdAddIcon);
