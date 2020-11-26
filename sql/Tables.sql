@@ -17,6 +17,7 @@ CREATE TABLE bmjs_module_option (
 CREATE TABLE bmjs_module_participation (
 	module_id		integer unsigned not null,
 	name			varchar(16) not null,
+	time			datetime not null default current_timestamp,
 	participation	integer unsigned not null,
 	constraint		part_uni unique(module_id, name),
 	constraint		bmp_option_id_fk foreign key(module_id) references bmjs_module(id) on delete cascade on update restrict

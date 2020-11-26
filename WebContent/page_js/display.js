@@ -31,7 +31,6 @@ function addParticipation(moduleIndex) {
 			success: function(result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
-					window.alert(participation.name + " a été ajouté");
 					getModules();
 				} else {
 					window.alert(updateResult.message);
@@ -58,7 +57,6 @@ function deleteParticipation(moduleIndex, partIndex) {
 			success: function(result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
-					window.alert(participation.name + " a été supprimé");
 					getModules();
 				} else {
 					window.alert(updateResult.message);
@@ -90,7 +88,6 @@ function addComment(moduleIndex) {
 			success: function(result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
-					window.alert("Votre message a été publié");
 					getModules();
 				} else {
 					window.alert(updateResult.message);
@@ -118,13 +115,24 @@ function deleteComment(moduleIndex, commentIndex) {
 			success: function(result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
-					window.alert("Le message a été supprimé");
 					getModules();
 				} else {
 					window.alert(updateResult.message);
 				}
 			}
 		});
+	}
+}
+
+function toggleModuleBody(moduleId) {
+	var body = document.getElementById("tbody_" + moduleId);
+	var icon = document.getElementById("icon_" + moduleId);
+	if (body.style.display === "none") {
+		body.style.display = "table-row-group";
+		icon.src = "images/arrowup.png";
+	} else {
+		body.style.display = "none";
+		icon.src = "images/arrowdown.png";
 	}
 }
 
@@ -167,29 +175,71 @@ function createModuleTable(module, moduleIndex) {
 	}
 
 	var tableModule = document.createElement("table");
-	tableModule.style = "margin-left: 10%; margin-right: 10%; margin-bottom: 60px; min-width: 80%; max-width: 80%; width: 80%";
+	tableModule.style = "table-layout: fixed; margin-left: 10%; margin-right: 10%; margin-bottom: 60px; min-width: 80%; max-width: 80%; width: 80%";
 
-	var tableModuleBody = document.createElement("tbody");
-	tableModule.appendChild(tableModuleBody);
+	var tableColGroup = document.createElement("colgroup");
+	tableModule.appendChild(tableColGroup);
+
+	var tableColGroupCol1 = document.createElement("col");
+	tableColGroup.appendChild(tableColGroupCol1);
+	tableColGroupCol1.style = "width: 240px";
+	var tableColGroupCol2 = document.createElement("col");
+	tableColGroup.appendChild(tableColGroupCol2);
+	tableColGroupCol2.style = "width: 60px";
+	var tableColGroupCol3 = document.createElement("col");
+	tableColGroup.appendChild(tableColGroupCol3);
+	tableColGroupCol3.style = "width: 180px";
+	var tableColGroupCol4 = document.createElement("col");
+	tableColGroup.appendChild(tableColGroupCol4);
+	tableColGroupCol4.style = "width: " + (Math.floor(windowWidth * 8 / 10) - 540) + "px";
+	var tableColGroupCol5 = document.createElement("col");
+	tableColGroup.appendChild(tableColGroupCol5);
+	tableColGroupCol5.style = "width: 60px";
+
+	var tableModuleHead = document.createElement("thead");
+	tableModule.appendChild(tableModuleHead);
+	tableModuleHead.addEventListener("click", (function(constModuleId) {
+		return function() {
+			toggleModuleBody(constModuleId);
+		}
+	})(module.id));
 
 	var tableModuleTitleTr = document.createElement("tr");
-	tableModuleBody.appendChild(tableModuleTitleTr);
+	tableModuleHead.appendChild(tableModuleTitleTr);
+	tableModuleTitleTr.style.cursor = "pointer";
 
 	{
 		var tableModuleTitleDateTd = document.createElement("td");
 		tableModuleTitleTr.appendChild(tableModuleTitleDateTd);
 		tableModuleTitleDateTd.id = "title";
-		tableModuleTitleDateTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px";
+		tableModuleTitleDateTd.style = "height: 48px; padding-left: 16px; background-color: #FFFFF7";
 		tableModuleTitleDateTd.innerHTML = "Date : " + new Date(module.end_date).toLocaleDateString("fr-fr", dateOptions);
 
-		var titleTextWidth = windowWidth * 8 / 10 - 240;
 		var tableModuleTitleTitleTd = document.createElement("td");
 		tableModuleTitleTr.appendChild(tableModuleTitleTitleTd);
 		tableModuleTitleTitleTd.id = "title";
 		tableModuleTitleTitleTd.colSpan = "3";
-		tableModuleTitleTitleTd.style = "min-width: " + titleTextWidth + "px; max-width: " + titleTextWidth + "px; padding: 16px";
+		tableModuleTitleTitleTd.style = "padding: 16px; background-color: #FFFFF7";
 		tableModuleTitleTitleTd.innerHTML = module.title;
+
+		var tableModuleTitleIconTd = document.createElement("td");
+		tableModuleTitleTr.appendChild(tableModuleTitleIconTd);
+		tableModuleTitleIconTd.id = "title";
+		tableModuleTitleIconTd.align = "center"
+		tableModuleTitleIconTd.style = "height: 48px; background-color: #FFFFF7";
+
+		var tableModuleTitleIcon = document.createElement("img");
+		tableModuleTitleIconTd.appendChild(tableModuleTitleIcon);
+		tableModuleTitleIcon.id = "icon_" + module.id;
+		tableModuleTitleIcon.src = "images/arrowdown.png";
+		tableModuleTitleIcon.width = "16";
+		tableModuleTitleIcon.height = "16";
 	}
+
+	var tableModuleBody = document.createElement("tbody");
+	tableModule.appendChild(tableModuleBody);
+	tableModuleBody.id = "tbody_" + module.id;
+	tableModuleBody.style.display = "none";
 
 	var tableModuleOptionTitleTr = document.createElement("tr");
 	tableModuleBody.appendChild(tableModuleOptionTitleTr);
@@ -197,17 +247,17 @@ function createModuleTable(module, moduleIndex) {
 	{
 		var tableModuleOptionPartTd = document.createElement("td");
 		tableModuleOptionTitleTr.appendChild(tableModuleOptionPartTd);
-		tableModuleOptionPartTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px";
+		tableModuleOptionPartTd.style = "height: 48px; padding-left: 16px; background-color: #F7F7FF";
 
 		var tableModuleOptionTotalTd = document.createElement("td");
 		tableModuleOptionTitleTr.appendChild(tableModuleOptionTotalTd);
 		tableModuleOptionTotalTd.align = "center"
-		tableModuleOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px";
+		tableModuleOptionTotalTd.style = "height: 48px; background-color: #F7F7FF";
 
 		var tableModuleOptionNewPartTd = document.createElement("td");
 		tableModuleOptionTitleTr.appendChild(tableModuleOptionNewPartTd);
 		tableModuleOptionNewPartTd.align = "center"
-		tableModuleOptionNewPartTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+		tableModuleOptionNewPartTd.style = "height: 48px; padding-left: 16px; padding-right: 16px; background-color: #F7F7FF";
 
 		var tableModuleOptionNewPart = document.createElement("input");
 		tableModuleOptionNewPartTd.appendChild(tableModuleOptionNewPart);
@@ -221,6 +271,8 @@ function createModuleTable(module, moduleIndex) {
 	var tableModulePartTd = document.createElement("td");
 	tableModuleOptionTitleTr.appendChild(tableModulePartTd);
 	tableModulePartTd.rowSpan = module.options.length + 3;
+	tableModulePartTd.colSpan = 2;
+	tableModulePartTd.style = "background-color: #F7F7FF";
 
 	var moduleElementOptions = new Array();
 	for (index = 0; index < module.options.length; index++) {
@@ -230,7 +282,7 @@ function createModuleTable(module, moduleIndex) {
 		{
 			var tableModuleOptionOptionTitleTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionTitleTd);
-			tableModuleOptionOptionTitleTd.style = "min-width: 240px; max-width: 240px; height: 48px; padding-left: 16px; overflow-x: hidden";
+			tableModuleOptionOptionTitleTd.style = "height: 48px; padding-left: 16px; overflow-x: hidden; background-color: #F7F7FF";
 			tableModuleOptionOptionTitleTd.innerHTML = module.options[index].title;
 		}
 
@@ -238,7 +290,7 @@ function createModuleTable(module, moduleIndex) {
 			var tableModuleOptionOptionTotalTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionTotalTd);
 			tableModuleOptionOptionTotalTd.align = "center"
-			tableModuleOptionOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleOptionOptionTotalTd.style = "height: 48px; padding-left: 16px; padding-right: 16px; background-color: #F7F7FF";
 			tableModuleOptionOptionTotalTd.innerHTML = participationsOption[index].toString();
 		}
 
@@ -246,7 +298,7 @@ function createModuleTable(module, moduleIndex) {
 			var tableModuleOptionOptionInputTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionInputTd);
 			tableModuleOptionOptionInputTd.align = "center"
-			tableModuleOptionOptionInputTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleOptionOptionInputTd.style = "height: 48px; padding-left: 16px; padding-right: 16px; background-color: #F7F7FF";
 
 			var tableModuleOptionOptionInput = document.createElement("input");
 			tableModuleOptionOptionInputTd.appendChild(tableModuleOptionOptionInput);
@@ -263,27 +315,28 @@ function createModuleTable(module, moduleIndex) {
 		{
 			var tableModuleOptionOptionTitleTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionTitleTd);
-			tableModuleOptionOptionTitleTd.style = "min-width: 240px; max-width: 240px; height: 48px";
+			tableModuleOptionOptionTitleTd.style = "height: 48px; background-color: #F7F7FF";
 		}
 
 		{
 			var tableModuleOptionOptionTotalTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionTotalTd);
 			tableModuleOptionOptionTotalTd.align = "center"
-			tableModuleOptionOptionTotalTd.style = "min-width: 60px; max-width: 60px; height: 48px";
+			tableModuleOptionOptionTotalTd.style = "height: 48px; background-color: #F7F7FF";
 		}
 
 		{
 			var tableModuleOptionOptionInputTd = document.createElement("td");
 			tableModuleOptionTr.appendChild(tableModuleOptionOptionInputTd);
 			tableModuleOptionOptionInputTd.align = "center"
-			tableModuleOptionOptionInputTd.style = "min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleOptionOptionInputTd.style = "height: 48px; padding-left: 16px; padding-right: 16px; background-color: #F7F7FF";
 
 			var tableModuleOptionOptionInputIcon = document.createElement("img");
 			tableModuleOptionOptionInputTd.appendChild(tableModuleOptionOptionInputIcon);
 			tableModuleOptionOptionInputIcon.src = "images/plus.png";
 			tableModuleOptionOptionInputIcon.width = "16";
 			tableModuleOptionOptionInputIcon.height = "16";
+			tableModuleOptionOptionInputIcon.style.cursor = "pointer";
 			tableModuleOptionOptionInputIcon.addEventListener("click", (function(constModuleIndex) {
 				return function() {
 					addParticipation(constModuleIndex);
@@ -299,7 +352,7 @@ function createModuleTable(module, moduleIndex) {
 		var tableModuleOptionVoidTd = document.createElement("td");
 		tableModuleOptionTr.appendChild(tableModuleOptionVoidTd);
 		tableModuleOptionVoidTd.colSpan = "3";
-		tableModuleOptionVoidTd.style = "height: 19px";
+		tableModuleOptionVoidTd.style = "height: 19px; background-color: #F7F7FF";
 	}
 
 	{
@@ -310,7 +363,7 @@ function createModuleTable(module, moduleIndex) {
 		var tableModuleMemberInnerTableBody = document.createElement("tbody");
 		tableModuleMemberInnerTable.appendChild(tableModuleMemberInnerTableBody);
 		tableModuleMemberInnerTableBody.style.display = "block";
-		tableModuleMemberInnerTableBody.style.width = (windowWidth * 8 / 10 - 450) + "px";
+		tableModuleMemberInnerTableBody.style.width = Math.floor(windowWidth * 8 / 10 - 480) + "px";
 		tableModuleMemberInnerTableBody.style.minHeight = ((module.options.length + 2) * 48 + 18) + "px";
 		tableModuleMemberInnerTableBody.style.overflowX = "scroll";
 
@@ -337,8 +390,7 @@ function createModuleTable(module, moduleIndex) {
 			for (index2 = 0; index2 < module.parts.length; index2++) {
 				var tableModuleMemberInnerTableTd = document.createElement("td");
 				tableModuleMemberInnerTableTr.appendChild(tableModuleMemberInnerTableTd);
-				tableModuleMemberInnerTableTd.align = "center"
-				tableModuleMemberInnerTableTd.style = "height: 48px; padding-left: 16px; padding-right: 16px";
+				tableModuleMemberInnerTableTd.style = "text-align: center; min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
 
 				var tableModuleMemberInnerTableTdIcon = document.createElement("img");
 				tableModuleMemberInnerTableTd.appendChild(tableModuleMemberInnerTableTdIcon);
@@ -359,14 +411,14 @@ function createModuleTable(module, moduleIndex) {
 			for (index = 0; index < module.parts.length; index++) {
 				var tableModuleMemberInnerTableTd = document.createElement("td");
 				tableModuleMemberInnerTableTr.appendChild(tableModuleMemberInnerTableTd);
-				tableModuleMemberInnerTableTd.align = "center"
-				tableModuleMemberInnerTableTd.style = "height: 48px; padding-left: 16px; padding-right: 16px";
+				tableModuleMemberInnerTableTd.style = "text-align: center; min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
 
 				var tableModuleMemberInnerTableIcon = document.createElement("img");
 				tableModuleMemberInnerTableTd.appendChild(tableModuleMemberInnerTableIcon);
 				tableModuleMemberInnerTableIcon.src = "images/trash.png";
 				tableModuleMemberInnerTableIcon.width = "16";
 				tableModuleMemberInnerTableIcon.height = "16";
+				tableModuleMemberInnerTableIcon.style.cursor = "pointer";
 				tableModuleMemberInnerTableIcon.addEventListener("click", (function(constModuleIndex, constPartIndex) {
 					return function() {
 						deleteParticipation(constModuleIndex, constPartIndex);
@@ -381,11 +433,32 @@ function createModuleTable(module, moduleIndex) {
 
 	var tableModuleCommentTd = document.createElement("td");
 	tableModuleCommentTr.appendChild(tableModuleCommentTd);
-	tableModuleCommentTd.colSpan = "4";
+	tableModuleCommentTd.colSpan = "5";
+	tableModuleCommentTd.style = "background-color: #FFF7F7";
 	{
 		var tableModuleCommentInnerTable = document.createElement("table");
 		tableModuleCommentTd.appendChild(tableModuleCommentInnerTable);
 		tableModuleCommentInnerTable.style = "border: 0px; width: 100%";
+
+		var tableModuleCommentInnerTableColGroup = document.createElement("colgroup");
+		tableModuleCommentInnerTable.appendChild(tableModuleCommentInnerTableColGroup);
+
+		var tableModuleCommentInnerTableColGroupCol1 = document.createElement("col");
+		tableModuleCommentInnerTableColGroup.appendChild(tableModuleCommentInnerTableColGroupCol1);
+		tableModuleCommentInnerTableColGroupCol1.style = "width: 90px";
+		var tableModuleCommentInnerTableColGroupCol2 = document.createElement("col");
+		tableModuleCommentInnerTableColGroup.appendChild(tableModuleCommentInnerTableColGroupCol2);
+		tableModuleCommentInnerTableColGroupCol2.style = "width: 150px";
+		var tableModuleCommentInnerTableColGroupCol3 = document.createElement("col");
+		tableModuleCommentInnerTableColGroup.appendChild(tableModuleCommentInnerTableColGroupCol3);
+		tableModuleCommentInnerTableColGroupCol3.style = "width: 150px";
+		var tableModuleCommentInnerTableColGroupCol4 = document.createElement("col");
+		tableModuleCommentInnerTableColGroup.appendChild(tableModuleCommentInnerTableColGroupCol4);
+		tableModuleCommentInnerTableColGroupCol4.style = "width: " + (windowWidth * 8 / 10 - 450) + "px";
+		var tableModuleCommentInnerTableColGroupCol5 = document.createElement("col");
+		tableModuleCommentInnerTableColGroup.appendChild(tableModuleCommentInnerTableColGroupCol5);
+		tableModuleCommentInnerTableColGroupCol5.style = "width: 60px";
+
 
 		{
 			var tableModuleCommentInnterTableTr = document.createElement("tr");
@@ -393,12 +466,12 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
-			tableModuleCommentInnterTableTdNameTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; min-width: 90px; max-width: 90px; height: 48px";
+			tableModuleCommentInnterTableTdNameTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; height: 48px";
 			tableModuleCommentInnterTableTdNameTitle.innerHTML = "Votre nom: ";
 
 			var tableModuleCommentInnterTableTdName = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
-			tableModuleCommentInnterTableTdName.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; min-width: 150px; max-width: 150px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleCommentInnterTableTdName.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; height: 48px; padding-left: 16px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdNameText = document.createElement("input");
 			tableModuleCommentInnterTableTdName.appendChild(tableModuleCommentInnterTableTdNameText);
@@ -410,13 +483,13 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdMessageTitle = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessageTitle);
-			tableModuleCommentInnterTableTdMessageTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; min-width: 150px; max-width: 150px; height: 48px; padding-right: 8px";
+			tableModuleCommentInnterTableTdMessageTitle.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: right; height: 48px; padding-right: 8px";
 			tableModuleCommentInnterTableTdMessageTitle.innerHTML = "Votre message: ";
 
 			var textWidth = windowWidth * 8 / 10 - 450;
 			var tableModuleCommentInnterTableTdMessage = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
-			tableModuleCommentInnterTableTdMessage.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; min-width: " + textWidth + "px; max-width: " + textWidth + "px; height: 48px; padding-left: 8px; padding-right: 16px";
+			tableModuleCommentInnterTableTdMessage.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; height: 48px; padding-left: 8px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdMessageText = document.createElement("input");
 			tableModuleCommentInnterTableTdMessage.appendChild(tableModuleCommentInnterTableTdMessageText);
@@ -426,13 +499,14 @@ function createModuleTable(module, moduleIndex) {
 
 			var tableModuleCommentInnterTableTdAdd = document.createElement("td");
 			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdAdd);
-			tableModuleCommentInnterTableTdAdd.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: center; min-width: 60px; max-width: 60px; height: 48px; padding-left: 16px; padding-right: 16px";
+			tableModuleCommentInnterTableTdAdd.style = "border-top: 1px solid grey; border-bottom: 1px solid grey; text-align: center; height: 48px; padding-left: 16px; padding-right: 16px";
 
 			var tableModuleCommentInnterTableTdAddIcon = document.createElement("img");
 			tableModuleCommentInnterTableTdAdd.appendChild(tableModuleCommentInnterTableTdAddIcon);
 			tableModuleCommentInnterTableTdAddIcon.src = "images/message.png";
 			tableModuleCommentInnterTableTdAddIcon.width = "16";
 			tableModuleCommentInnterTableTdAddIcon.height = "16";
+			tableModuleCommentInnterTableTdAddIcon.style.cursor = "pointer";
 			tableModuleCommentInnterTableTdAddIcon.addEventListener("click", (function(constModuleIndex) {
 				return function() {
 					return addComment(constModuleIndex);
@@ -475,6 +549,7 @@ function createModuleTable(module, moduleIndex) {
 			tableModuleCommentInnterTableTdDeleteIcon.src = "images/trash.png";
 			tableModuleCommentInnterTableTdDeleteIcon.width = "16";
 			tableModuleCommentInnterTableTdDeleteIcon.height = "16";
+			tableModuleCommentInnterTableTdDeleteIcon.style.cursor = "pointer";
 			tableModuleCommentInnterTableTdDeleteIcon.addEventListener("click", (function(constModuleIndex, constCommentIndex) {
 				return function() {
 					return deleteComment(constModuleIndex, constCommentIndex);
@@ -506,14 +581,17 @@ function getModules() {
 
 			modules = $.parseJSON(result);
 			moduleElements = new Array();
-			var index;
-			for (index = 0; index < modules.length; index++) {
-				module = modules[index];
-				var table = createModuleTable(module, index);
-				newModulePanel.appendChild(table);
-			}
+			if (modules.length > 0) {
+				var index;
+				for (index = 0; index < modules.length; index++) {
+					module = modules[index];
+					var table = createModuleTable(module, index);
+					newModulePanel.appendChild(table);
+				}
+				modulePanel.parentNode.replaceChild(newModulePanel, modulePanel);
 
-			modulePanel.parentNode.replaceChild(newModulePanel, modulePanel);
+				toggleModuleBody(modules[0].id)
+			}
 			hideLoading();
 		}
 	});
