@@ -146,16 +146,3 @@ body {
 		padding-top: 10px;
 	}
 }
-
-table {
-	border: 1px solid grey;
-	border-collapse: collapse;
-}
-
-td#title {
-	border: 1px solid grey;
-}
-
-td {
-	border: 0;
-}

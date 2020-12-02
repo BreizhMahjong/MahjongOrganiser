@@ -9,6 +9,7 @@
 <title>Breizh Mahjong Organizer</title>
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
+<link href="css/modulestyle.css" rel="stylesheet">
 
 </head>
 <body>
