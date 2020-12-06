@@ -1,11 +1,20 @@
 var modules;
 var moduleElements;
 
+function toggleOption(moduleIndex, optionIndex) {
+	moduleElements[moduleIndex].options[optionIndex] = !moduleElements[moduleIndex].options[optionIndex];
+	if (moduleElements[moduleIndex].options[optionIndex]) {
+		moduleElements[moduleIndex].optionImages[optionIndex].src = "images/checked.png";
+	} else {
+		moduleElements[moduleIndex].optionImages[optionIndex].src = "images/unchecked.png";
+	}
+}
+
 function addParticipation(moduleIndex) {
 	var part = 0;
 	var index;
 	for (index = 0; index < moduleElements[moduleIndex].options.length; index++) {
-		if (moduleElements[moduleIndex].options[index].checked) {
+		if (moduleElements[moduleIndex].options[index]) {
 			part = part | (1 << index);
 		}
 	}
@@ -152,7 +161,6 @@ function createModuleTable(module, moduleIndex) {
 		second: "2-digit"
 	};
 
-	var windowWidth = $(window).width();
 	var index, index2;
 	var moduleElement = new Object();
 
@@ -174,7 +182,6 @@ function createModuleTable(module, moduleIndex) {
 		participationsOption.push(participationOption);
 	}
 
-	var moduleWidth = Math.floor(windowWidth * 8 / 10);
 	var divModule = document.createElement("div");
 	divModule.className = "div-module";
 
@@ -347,18 +354,29 @@ function createModuleTable(module, moduleIndex) {
 			moduleElement.partName = divModulePartLeftNewPartNameInput;
 
 			var moduleElementOptions = new Array();
+			var moduleElementOptionImages = new Array();
 			for (index = 0; index < module.options.length; index++) {
 				var divModulePartLeftNewPartOption = document.createElement("div");
 				divModulePartLeftNewPartCol.appendChild(divModulePartLeftNewPartOption);
 				divModulePartLeftNewPartOption.className = "div-module-part-left-newpart-cell";
 
-				var divModulePartLeftNewPartOptionInput = document.createElement("input");
-				divModulePartLeftNewPartOption.appendChild(divModulePartLeftNewPartOptionInput);
-				divModulePartLeftNewPartOptionInput.type = "checkbox";
+				var divModulePartLeftNewPartOptionImg = document.createElement("img");
+				divModulePartLeftNewPartOption.appendChild(divModulePartLeftNewPartOptionImg);
+				divModulePartLeftNewPartOptionImg.width = "16";
+				divModulePartLeftNewPartOptionImg.height = "16";
+				divModulePartLeftNewPartOptionImg.src = "images/unchecked.png";
 
-				moduleElementOptions.push(divModulePartLeftNewPartOptionInput);
+				divModulePartLeftNewPartOptionImg.addEventListener("click", (function(constModuleIndex, constOptionIndex) {
+					return function() {
+						toggleOption(constModuleIndex, constOptionIndex);
+					}
+				})(moduleIndex, index));
+
+				moduleElementOptions.push(false);
+				moduleElementOptionImages.push(divModulePartLeftNewPartOptionImg);
 			}
 			moduleElement.options = moduleElementOptions;
+			moduleElement.optionImages = moduleElementOptionImages;
 
 			var divModulePartLeftNewPartIcon = document.createElement("div");
 			divModulePartLeftNewPartCol.appendChild(divModulePartLeftNewPartIcon);
@@ -382,7 +400,7 @@ function createModuleTable(module, moduleIndex) {
 	var divModuleComment = document.createElement("div");
 	divModuleFoldable.appendChild(divModuleComment);
 	divModuleComment.className = "div-module-comment";
-	
+
 	{
 		var tableModuleCommentInnerTable = document.createElement("table");
 		divModuleComment.appendChild(tableModuleCommentInnerTable);
