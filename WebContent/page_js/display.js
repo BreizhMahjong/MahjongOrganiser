@@ -149,7 +149,7 @@ function createModuleTable(module, moduleIndex) {
 	var dateOptions = {
 		year: "numeric",
 		month: "long",
-		day: "numeric"
+		day: "2-digit"
 	};
 
 	var dateTimeOptions = {
@@ -163,6 +163,11 @@ function createModuleTable(module, moduleIndex) {
 
 	var index, index2;
 	var moduleElement = new Object();
+	var today = new Date();
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	today.setMilliseconds(0);
 
 	var participations = new Array();
 	var participationsOption = new Array();
@@ -197,8 +202,14 @@ function createModuleTable(module, moduleIndex) {
 	{
 		var divModuleTitleDate = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleDate);
-		divModuleTitleDate.className = "div-module-title-date";
-		divModuleTitleDate.innerHTML = "Date : " + new Date(module.end_date).toLocaleDateString("fr-fr", dateOptions);
+		var moduleEndDate = new Date(module.end_date);
+		if (moduleEndDate.getTime() >= today.getTime()) {
+			divModuleTitleDate.className = "div-module-title-date";
+			divModuleTitleDate.innerHTML = "Date : " + moduleEndDate.toLocaleDateString("fr-fr", dateOptions);
+		} else {
+			divModuleTitleDate.className = "div-module-title-date-closed";
+			divModuleTitleDate.innerHTML = "Date : " + moduleEndDate.toLocaleDateString("fr-fr", dateOptions) + " (fermé)";
+		}
 
 		var divModuleTitleTitle = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleTitle);
@@ -512,8 +523,8 @@ function getModules() {
 		type: "POST",
 		data: {
 			"action": "get_module",
-			"nb_modules": 5,
-			"opened_only": 1,
+			"nb_modules": moduleLimitConst,
+			"opened_only": moduleOpenedOnlyConst,
 			"type": moduleTypeConst
 		},
 		success: function(result) {

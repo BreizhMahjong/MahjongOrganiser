@@ -21,6 +21,14 @@
 	padding: 16px;
 }
 
+.div-module-title-date-closed {
+	display: table-cell;
+	width: 240px;
+	height: 48px;
+	padding: 16px;
+	color: #FF0000;
+}
+
 .div-module-title-title {
 	display: table-cell;
 	height: 48px;

@@ -174,11 +174,18 @@ if(isset($_GET["menu"])) {
 	<script type="text/javascript" src="lib/jquery.leanModal.min.js"></script>
 	<script type="text/javascript" src="page_js/main.js"></script>
 	<?php
+	if($isAdmin) {
+		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=0</script>";
+		echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
+	} else {
+		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=1</script>";
+		echo "<script type=\"text/javascript\">var moduleLimitConst=5</script>";
+	}
 	if($menu === "meeting") {
 		echo "<script type=\"text/javascript\">var moduleTypeConst=0</script>";
 		echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
 	} else if($menu === "event") {
-		echo "<script type=\"text/javascript\" type=\"text/javascript\">var moduleTypeConst=1</script>";
+		echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
 		echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
 	} else {
 		echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";
