@@ -11,35 +11,35 @@
 	display: table;
 	border: 1px solid grey;
 	cursor: pointer;
-	background-color: #FFFFF7;
+	background: #F8FFF8;
 }
 
 .div-module-title-date {
 	display: table-cell;
-	width: 240px;
+	width: 300px;
 	height: 48px;
-	padding: 16px;
+	padding: 12px 16px 12px 16px;
 }
 
 .div-module-title-date-closed {
 	display: table-cell;
-	width: 240px;
+	width: 300px;
 	height: 48px;
-	padding: 16px;
+	padding: 12px 16px 12px 16px;
 	color: #FF0000;
 }
 
 .div-module-title-title {
 	display: table-cell;
 	height: 48px;
-	padding: 16px;
+	padding: 12px 16px 12px 16px;
 }
 
 .div-module-title-icon {
 	display: table-cell;
 	width: 60px;
 	height: 48px;
-	padding: 16px;
+	padding: 12px 16px 12px 16px;
 }
 
 .div-module-foldable {
@@ -49,7 +49,7 @@
 .div-module-part {
 	width: 100%;
 	border: 1px solid grey;
-	background-color: #F7F7FF;
+	background: #F8F8FF;
 }
 
 .div-module-part-left {
@@ -60,7 +60,6 @@
 .div-module-part-left-nbpart-col {
 	float: left;
 	width: 60px;
-	background-color: #F7F7FF;
 }
 
 .div-module-part-left-nbpart-cell {
@@ -72,7 +71,6 @@
 .div-module-part-left-option-col {
 	float: left;
 	width: 240px;
-	background-color: #F7F7FF;
 }
 
 .div-module-part-left-option-cell {
@@ -84,7 +82,6 @@
 .div-module-part-left-newpart-col {
 	float: left;
 	width: 180px;
-	background-color: #F7F7FF;
 }
 
 .div-module-part-left-newpart-cell {
@@ -98,7 +95,6 @@
 	float: right;
 	overflow-x: visible;
 	overflow-y: hidden;
-	background-color: #F7F7FF;
 }
 
 .div-module-part-right-part-col {
@@ -116,7 +112,7 @@
 	width: 100%;
 	display: table;
 	border: 1px solid grey;
-	background-color: FFF7F7;
+	background: #FFFFF8;
 }
 
 .div-module-comment-table {

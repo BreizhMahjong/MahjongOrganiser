@@ -1,3 +1,7 @@
+var DAYS_OF_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+var DAYS_OF_MONTH_LEAP = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+var today;
 var modules;
 var moduleElements;
 
@@ -37,7 +41,7 @@ function addParticipation(moduleIndex) {
 				"action": "new_part",
 				"part": JSON.stringify(participation)
 			},
-			success: function(result) {
+			success: function (result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
 					getModules();
@@ -47,6 +51,80 @@ function addParticipation(moduleIndex) {
 			}
 		});
 	}
+}
+
+function prepareEditParticipation(moduleIndex, partIndex) {
+	var module = modules[moduleIndex];
+	moduleElements[moduleIndex].partName.value = module.parts[partIndex].name;
+	moduleElements[moduleIndex].partName.setAttribute("disabled", "true");
+
+	var optionIndex;
+	var mask;
+	for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
+		mask = 1 << optionIndex;
+		moduleElements[moduleIndex].options[optionIndex] = ((module.parts[partIndex].participation & mask) > 0);
+		if (moduleElements[moduleIndex].options[optionIndex]) {
+			moduleElements[moduleIndex].optionImages[optionIndex].src = "images/checked.png";
+		} else {
+			moduleElements[moduleIndex].optionImages[optionIndex].src = "images/unchecked.png";
+		}
+	}
+
+	moduleElements[moduleIndex].addParticipationButton.style.display = "none";
+	moduleElements[moduleIndex].saveModifyParticipationButton.style.display = "";
+	moduleElements[moduleIndex].cancelModifyParticipationButton.style.display = "";
+}
+
+function saveModifyParticipation(moduleIndex) {
+	var part = 0;
+	var index;
+	for (index = 0; index < moduleElements[moduleIndex].options.length; index++) {
+		if (moduleElements[moduleIndex].options[index]) {
+			part = part | (1 << index);
+		}
+	}
+
+	if (part == 0) {
+		window.alert("Il faut choisir au moins une option");
+	} else {
+		var participation = {
+			"module_id": modules[moduleIndex].id,
+			"name": moduleElements[moduleIndex].partName.value,
+			"participation": part
+		};
+
+		$.ajax({
+			url: SERVER_QUERY_URL,
+			type: "POST",
+			data: {
+				"action": "modify_part",
+				"part": JSON.stringify(participation)
+			},
+			success: function (result) {
+				updateResult = $.parseJSON(result);
+				if (updateResult.result) {
+					getModules();
+				} else {
+					window.alert(updateResult.message);
+				}
+			}
+		});
+	}
+}
+
+function cancelModifyParticipation(moduleIndex) {
+	var module = modules[moduleIndex];
+	moduleElements[moduleIndex].partName.value = "";
+	moduleElements[moduleIndex].partName.removeAttribute("disabled");
+
+	var optionIndex;
+	for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
+		moduleElements[moduleIndex].optionImages[optionIndex].src = "images/unchecked.png";
+	}
+
+	moduleElements[moduleIndex].addParticipationButton.style.display = "";
+	moduleElements[moduleIndex].saveModifyParticipationButton.style.display = "none";
+	moduleElements[moduleIndex].cancelModifyParticipationButton.style.display = "none";
 }
 
 function deleteParticipation(moduleIndex, partIndex) {
@@ -63,7 +141,7 @@ function deleteParticipation(moduleIndex, partIndex) {
 				"action": "delete_part",
 				"part": JSON.stringify(participation)
 			},
-			success: function(result) {
+			success: function (result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
 					getModules();
@@ -94,7 +172,7 @@ function addComment(moduleIndex) {
 				"action": "new_cmt",
 				"comment": JSON.stringify(comment)
 			},
-			success: function(result) {
+			success: function (result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
 					getModules();
@@ -121,7 +199,7 @@ function deleteComment(moduleIndex, commentIndex) {
 				"action": "delete_cmt",
 				"comment": JSON.stringify(comment)
 			},
-			success: function(result) {
+			success: function (result) {
 				updateResult = $.parseJSON(result);
 				if (updateResult.result) {
 					getModules();
@@ -145,11 +223,12 @@ function toggleModuleBody(moduleId) {
 	}
 }
 
-function createModuleTable(module, moduleIndex) {
+function createModuleTable(module, moduleIndex, hue) {
 	var dateOptions = {
 		year: "numeric",
 		month: "long",
-		day: "2-digit"
+		day: "2-digit",
+		weekday: "long"
 	};
 
 	var dateTimeOptions = {
@@ -163,11 +242,7 @@ function createModuleTable(module, moduleIndex) {
 
 	var index, index2;
 	var moduleElement = new Object();
-	var today = new Date();
-	today.setHours(0);
-	today.setMinutes(0);
-	today.setSeconds(0);
-	today.setMilliseconds(0);
+	moduleElements.push(moduleElement);
 
 	var participations = new Array();
 	var participationsOption = new Array();
@@ -190,16 +265,16 @@ function createModuleTable(module, moduleIndex) {
 	var divModule = document.createElement("div");
 	divModule.className = "div-module";
 
-	var divModuleTitle = document.createElement("div");
-	divModule.appendChild(divModuleTitle);
-	divModuleTitle.className = "div-module-title";
-	divModuleTitle.addEventListener("click", (function(constModuleId) {
-		return function() {
-			toggleModuleBody(constModuleId);
-		}
-	})(module.id));
-
 	{
+		var divModuleTitle = document.createElement("div");
+		divModule.appendChild(divModuleTitle);
+		divModuleTitle.className = "div-module-title";
+		divModuleTitle.style.background = "hsl(" + hue + ", 100%, 98.5%)";
+		divModuleTitle.addEventListener("click", (function (constModuleId) {
+				return function () {
+					toggleModuleBody(constModuleId);
+				}
+			})(module.id));
 		var divModuleTitleDate = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleDate);
 		var moduleEndDate = new Date(module.end_date);
@@ -218,7 +293,7 @@ function createModuleTable(module, moduleIndex) {
 
 		var divModuleTitleIcon = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleIcon);
-		divModuleTitleIcon.className = "div-module-title-icon"
+		divModuleTitleIcon.className = "div-module-title-icon";
 
 		var divModuleTitleIconImg = document.createElement("img");
 		divModuleTitleIcon.appendChild(divModuleTitleIconImg);
@@ -228,84 +303,95 @@ function createModuleTable(module, moduleIndex) {
 		divModuleTitleIconImg.height = "16";
 	}
 
-	var divModuleFoldable = document.createElement("div");
-	divModule.appendChild(divModuleFoldable);
-	divModuleFoldable.className = "div-module-foldable";
-	divModuleFoldable.id = "div_" + module.id;
-	divModuleFoldable.style.display = "none";
-
-	var divModulePart = document.createElement("div");
-	divModuleFoldable.appendChild(divModulePart);
-	divModulePart.className = "div-module-part";
-	divModulePart.style.height = ((module.options.length + 2) * 48 + 20) + "px";
-
 	{
-		var divModulePartRight = document.createElement("div");
-		divModulePart.appendChild(divModulePartRight);
-		divModulePartRight.className = "div-module-part-right";
-
-		var divModulePartRightWrapper = document.createElement("div");
-		divModulePartRight.appendChild(divModulePartRightWrapper);
-		divModulePartRightWrapper.style.width = (module.parts.length * 150) + "px";
-		if (module.parts.length * 150 < 720) {
-			divModulePartRightWrapper.style.marginRight = (720 - module.parts.length * 150) + "px";
-		}
-
-		var moduleElementParts = new Array();
-
-		for (index = 0; index < module.parts.length; index++) {
-			var divModulePartRightCol = document.createElement("div");
-			divModulePartRightWrapper.appendChild(divModulePartRightCol);
-			divModulePartRightCol.className = "div-module-part-right-part-col";
-
-			var divModulePartRightName = document.createElement("div");
-			divModulePartRightCol.appendChild(divModulePartRightName);
-			divModulePartRightName.className = "div-module-part-right-part-cell";
-			divModulePartRightName.innerHTML = module.parts[index].name;
-
-			moduleElementParts.push(module.parts[index].name);
-
-			for (index2 = 0; index2 < module.options.length; index2++) {
-				var divModulePartRightPart = document.createElement("div");
-				divModulePartRightCol.appendChild(divModulePartRightPart);
-				divModulePartRightPart.className = "div-module-part-right-part-cell";
-
-				var divModulePartRightPartImg = document.createElement("img");
-				divModulePartRightPart.appendChild(divModulePartRightPartImg);
-				divModulePartRightPartImg.width = "16";
-				divModulePartRightPartImg.height = "16";
-				if (participations[index2][index] == 1) {
-					divModulePartRightPartImg.src = "images/checked.png";
-				} else {
-					divModulePartRightPartImg.src = "images/unchecked.png";
-				}
-			}
-
-			var divModulePartRightNameRemove = document.createElement("div");
-			divModulePartRightCol.appendChild(divModulePartRightNameRemove);
-			divModulePartRightNameRemove.className = "div-module-part-right-part-cell";
-
-			var divModulePartRightNameRemoveImg = document.createElement("img");
-			divModulePartRightNameRemove.appendChild(divModulePartRightNameRemoveImg);
-			divModulePartRightNameRemoveImg.src = "images/trash.png";
-			divModulePartRightNameRemoveImg.width = "16";
-			divModulePartRightNameRemoveImg.height = "16";
-			divModulePartRightNameRemoveImg.style.cursor = "pointer";
-			divModulePartRightNameRemoveImg.addEventListener("click", (function(constModuleIndex, constPartIndex) {
-				return function() {
-					deleteParticipation(constModuleIndex, constPartIndex);
-				}
-			})(moduleIndex, index));
-		}
-		moduleElement.parts = moduleElementParts;
-	}
-
-	{
-		var divModulePartLeft = document.createElement("div");
-		divModulePart.appendChild(divModulePartLeft);
-		divModulePartLeft.className = "div-module-part-left";
+		var divModuleFoldable = document.createElement("div");
+		divModule.appendChild(divModuleFoldable);
+		divModuleFoldable.className = "div-module-foldable";
+		divModuleFoldable.id = "div_" + module.id;
+		divModuleFoldable.style.display = "none";
 
 		{
+			var divModulePart = document.createElement("div");
+			divModuleFoldable.appendChild(divModulePart);
+			divModulePart.className = "div-module-part";
+			divModulePart.style.background = "hsl(" + (hue + 30) + ", 100%, 98.5%)";
+			divModulePart.style.height = ((module.options.length + 2) * 48 + 20) + "px";
+			var divModulePartRight = document.createElement("div");
+			divModulePart.appendChild(divModulePartRight);
+			divModulePartRight.className = "div-module-part-right";
+
+			var divModulePartRightWrapper = document.createElement("div");
+			divModulePartRight.appendChild(divModulePartRightWrapper);
+			divModulePartRightWrapper.style.width = (module.parts.length * 150) + "px";
+			if (module.parts.length * 150 < 720) {
+				divModulePartRightWrapper.style.marginRight = (720 - module.parts.length * 150) + "px";
+			}
+
+			var moduleElementParts = new Array();
+			for (index = 0; index < module.parts.length; index++) {
+				var divModulePartRightCol = document.createElement("div");
+				divModulePartRightWrapper.appendChild(divModulePartRightCol);
+				divModulePartRightCol.className = "div-module-part-right-part-col";
+
+				var divModulePartRightName = document.createElement("div");
+				divModulePartRightCol.appendChild(divModulePartRightName);
+				divModulePartRightName.className = "div-module-part-right-part-cell";
+				divModulePartRightName.innerHTML = module.parts[index].name;
+
+				moduleElementParts.push(module.parts[index].name);
+
+				for (index2 = 0; index2 < module.options.length; index2++) {
+					var divModulePartRightPart = document.createElement("div");
+					divModulePartRightCol.appendChild(divModulePartRightPart);
+					divModulePartRightPart.className = "div-module-part-right-part-cell";
+
+					var divModulePartRightPartImg = document.createElement("img");
+					divModulePartRightPart.appendChild(divModulePartRightPartImg);
+					divModulePartRightPartImg.width = "16";
+					divModulePartRightPartImg.height = "16";
+					if (participations[index2][index] == 1) {
+						divModulePartRightPartImg.src = "images/checked.png";
+					} else {
+						divModulePartRightPartImg.src = "images/unchecked.png";
+					}
+				}
+
+				var divModulePartRightNameRemove = document.createElement("div");
+				divModulePartRightCol.appendChild(divModulePartRightNameRemove);
+				divModulePartRightNameRemove.className = "div-module-part-right-part-cell";
+
+				var divModulePartRightNameEditImg = document.createElement("img");
+				divModulePartRightNameRemove.appendChild(divModulePartRightNameEditImg);
+				divModulePartRightNameEditImg.src = "images/edit.png";
+				divModulePartRightNameEditImg.width = "16";
+				divModulePartRightNameEditImg.height = "16";
+				divModulePartRightNameEditImg.style.cursor = "pointer";
+				divModulePartRightNameEditImg.style.margin = "0px 8px";
+				divModulePartRightNameEditImg.addEventListener("click", (function (constModuleIndex, constPartIndex) {
+						return function () {
+							prepareEditParticipation(constModuleIndex, constPartIndex);
+						}
+					})(moduleIndex, index));
+
+				var divModulePartRightNameRemoveImg = document.createElement("img");
+				divModulePartRightNameRemove.appendChild(divModulePartRightNameRemoveImg);
+				divModulePartRightNameRemoveImg.src = "images/trash.png";
+				divModulePartRightNameRemoveImg.width = "16";
+				divModulePartRightNameRemoveImg.height = "16";
+				divModulePartRightNameRemoveImg.style.cursor = "pointer";
+				divModulePartRightNameRemoveImg.style.margin = "0px 8px";
+				divModulePartRightNameRemoveImg.addEventListener("click", (function (constModuleIndex, constPartIndex) {
+						return function () {
+							deleteParticipation(constModuleIndex, constPartIndex);
+						}
+					})(moduleIndex, index));
+			}
+			moduleElement.parts = moduleElementParts;
+
+			var divModulePartLeft = document.createElement("div");
+			divModulePart.appendChild(divModulePartLeft);
+			divModulePartLeft.className = "div-module-part-left";
+
 			var divModulePartLeftTotalCol = document.createElement("div");
 			divModulePartLeft.appendChild(divModulePartLeftTotalCol);
 			divModulePartLeftTotalCol.className = "div-module-part-left-nbpart-col";
@@ -324,9 +410,7 @@ function createModuleTable(module, moduleIndex) {
 			divModulePartLeftTotalSpaceBottom = document.createElement("div");
 			divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalSpaceBottom);
 			divModulePartLeftTotalSpaceBottom.className = "div-module-part-left-nbpart-cell";
-		}
 
-		{
 			var divModulePartLeftOptionCol = document.createElement("div");
 			divModulePartLeft.appendChild(divModulePartLeftOptionCol);
 			divModulePartLeftOptionCol.className = "div-module-part-left-option-col";
@@ -345,9 +429,7 @@ function createModuleTable(module, moduleIndex) {
 			var divModulePartLeftOptionSpaceBottom = document.createElement("div");
 			divModulePartLeftOptionCol.appendChild(divModulePartLeftOptionSpaceBottom);
 			divModulePartLeftOptionSpaceBottom.className = "div-module-part-left-option-cell";
-		}
 
-		{
 			var divModulePartLeftNewPartCol = document.createElement("div");
 			divModulePartLeft.appendChild(divModulePartLeftNewPartCol);
 			divModulePartLeftNewPartCol.className = "div-module-part-left-newpart-col";
@@ -377,11 +459,11 @@ function createModuleTable(module, moduleIndex) {
 				divModulePartLeftNewPartOptionImg.height = "16";
 				divModulePartLeftNewPartOptionImg.src = "images/unchecked.png";
 
-				divModulePartLeftNewPartOptionImg.addEventListener("click", (function(constModuleIndex, constOptionIndex) {
-					return function() {
-						toggleOption(constModuleIndex, constOptionIndex);
-					}
-				})(moduleIndex, index));
+				divModulePartLeftNewPartOptionImg.addEventListener("click", (function (constModuleIndex, constOptionIndex) {
+						return function () {
+							toggleOption(constModuleIndex, constOptionIndex);
+						}
+					})(moduleIndex, index));
 
 				moduleElementOptions.push(false);
 				moduleElementOptionImages.push(divModulePartLeftNewPartOptionImg);
@@ -399,25 +481,53 @@ function createModuleTable(module, moduleIndex) {
 			divModulePartLeftNewPartIconImg.width = "16";
 			divModulePartLeftNewPartIconImg.height = "16";
 			divModulePartLeftNewPartIconImg.style.cursor = "pointer";
-			divModulePartLeftNewPartIconImg.addEventListener("click", (function(constModuleIndex) {
-				return function() {
-					addParticipation(constModuleIndex);
-				}
-			})(moduleIndex));
+			divModulePartLeftNewPartIconImg.style.margin = "0px 8px";
+			divModulePartLeftNewPartIconImg.addEventListener("click", (function (constModuleIndex) {
+					return function () {
+						addParticipation(constModuleIndex);
+					}
+				})(moduleIndex));
+			moduleElement.addParticipationButton = divModulePartLeftNewPartIconImg;
+
+			var divModulePartLeftModifyPartIconImg = document.createElement("img");
+			divModulePartLeftNewPartIcon.appendChild(divModulePartLeftModifyPartIconImg);
+			divModulePartLeftModifyPartIconImg.src = "images/save.png";
+			divModulePartLeftModifyPartIconImg.width = "16";
+			divModulePartLeftModifyPartIconImg.height = "16";
+			divModulePartLeftModifyPartIconImg.style.cursor = "pointer";
+			divModulePartLeftModifyPartIconImg.style.margin = "0px 8px";
+			divModulePartLeftModifyPartIconImg.style.display = "none";
+			divModulePartLeftModifyPartIconImg.addEventListener("click", (function (constModuleIndex) {
+					return function () {
+						saveModifyParticipation(constModuleIndex);
+					}
+				})(moduleIndex));
+			moduleElement.saveModifyParticipationButton = divModulePartLeftModifyPartIconImg;
+
+			var divModulePartLeftCancelPartIconImg = document.createElement("img");
+			divModulePartLeftNewPartIcon.appendChild(divModulePartLeftCancelPartIconImg);
+			divModulePartLeftCancelPartIconImg.src = "images/cancel.png";
+			divModulePartLeftCancelPartIconImg.width = "16";
+			divModulePartLeftCancelPartIconImg.height = "16";
+			divModulePartLeftCancelPartIconImg.style.cursor = "pointer";
+			divModulePartLeftCancelPartIconImg.style.margin = "0px 8px";
+			divModulePartLeftCancelPartIconImg.style.display = "none";
+			divModulePartLeftCancelPartIconImg.addEventListener("click", (function (constModuleIndex) {
+					return function () {
+						cancelModifyParticipation(constModuleIndex);
+					}
+				})(moduleIndex));
+			moduleElement.cancelModifyParticipationButton = divModulePartLeftCancelPartIconImg;
 		}
-	}
-	moduleElements.push(moduleElement);
-
-	var divModuleComment = document.createElement("div");
-	divModuleFoldable.appendChild(divModuleComment);
-	divModuleComment.className = "div-module-comment";
-
-	{
-		var tableModuleCommentInnerTable = document.createElement("table");
-		divModuleComment.appendChild(tableModuleCommentInnerTable);
-		tableModuleCommentInnerTable.className = "div-module-comment-table";
 
 		{
+			var divModuleComment = document.createElement("div");
+			divModuleFoldable.appendChild(divModuleComment);
+			divModuleComment.className = "div-module-comment";
+			divModuleComment.style.background = "hsl(" + (hue + 60) + ", 100%, 98.5%)";
+			var tableModuleCommentInnerTable = document.createElement("table");
+			divModuleComment.appendChild(tableModuleCommentInnerTable);
+			tableModuleCommentInnerTable.className = "div-module-comment-table";
 			var tableModuleCommentInnterTableTr = document.createElement("tr");
 			tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
 
@@ -463,56 +573,55 @@ function createModuleTable(module, moduleIndex) {
 			tableModuleCommentInnterTableTdAddIcon.width = "16";
 			tableModuleCommentInnterTableTdAddIcon.height = "16";
 			tableModuleCommentInnterTableTdAddIcon.style.cursor = "pointer";
-			tableModuleCommentInnterTableTdAddIcon.addEventListener("click", (function(constModuleIndex) {
-				return function() {
-					return addComment(constModuleIndex);
-				}
-			})(moduleIndex));
+			tableModuleCommentInnterTableTdAddIcon.addEventListener("click", (function (constModuleIndex) {
+					return function () {
+						return addComment(constModuleIndex);
+					}
+				})(moduleIndex));
 
 			moduleElement.commentText = tableModuleCommentInnterTableTdMessageText;
-		}
 
-		for (index = 0; index < module.comments.length; index++) {
-			var tableModuleCommentInnterTableTr = document.createElement("tr");
-			tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
+			for (index = 0; index < module.comments.length; index++) {
+				var tableModuleCommentInnterTableTr = document.createElement("tr");
+				tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
 
-			var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
-			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
-			tableModuleCommentInnterTableTdNameTitle.className = "div-module-comment-table-body-col1";
+				var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
+				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
+				tableModuleCommentInnterTableTdNameTitle.className = "div-module-comment-table-body-col1";
 
-			var tableModuleCommentInnterTableTdName = document.createElement("td");
-			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
-			tableModuleCommentInnterTableTdName.className = "div-module-comment-table-body-col2";
-			tableModuleCommentInnterTableTdName.innerHTML = module.comments[index].comment_name;
+				var tableModuleCommentInnterTableTdName = document.createElement("td");
+				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
+				tableModuleCommentInnterTableTdName.className = "div-module-comment-table-body-col2";
+				tableModuleCommentInnterTableTdName.innerHTML = module.comments[index].comment_name;
 
-			var tableModuleCommentInnterTableTdTime = document.createElement("td");
-			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdTime);
-			tableModuleCommentInnterTableTdTime.className = "div-module-comment-table-body-col3";
-			tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].comment_time) * 1000).toLocaleDateString("fr-fr", dateTimeOptions);
+				var tableModuleCommentInnterTableTdTime = document.createElement("td");
+				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdTime);
+				tableModuleCommentInnterTableTdTime.className = "div-module-comment-table-body-col3";
+				tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].comment_time) * 1000).toLocaleDateString("fr-fr", dateTimeOptions);
 
-			var tableModuleCommentInnterTableTdMessage = document.createElement("td");
-			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
-			tableModuleCommentInnterTableTdMessage.className = "div-module-comment-table-body-col4";
-			tableModuleCommentInnterTableTdMessage.innerHTML = module.comments[index].comment_text;
+				var tableModuleCommentInnterTableTdMessage = document.createElement("td");
+				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
+				tableModuleCommentInnterTableTdMessage.className = "div-module-comment-table-body-col4";
+				tableModuleCommentInnterTableTdMessage.innerHTML = module.comments[index].comment_text;
 
-			var tableModuleCommentInnterTableTdDelete = document.createElement("td");
-			tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdDelete);
-			tableModuleCommentInnterTableTdDelete.className = "div-module-comment-table-body-col5";
+				var tableModuleCommentInnterTableTdDelete = document.createElement("td");
+				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdDelete);
+				tableModuleCommentInnterTableTdDelete.className = "div-module-comment-table-body-col5";
 
-			var tableModuleCommentInnterTableTdDeleteIcon = document.createElement("img");
-			tableModuleCommentInnterTableTdDelete.appendChild(tableModuleCommentInnterTableTdDeleteIcon);
-			tableModuleCommentInnterTableTdDeleteIcon.src = "images/trash.png";
-			tableModuleCommentInnterTableTdDeleteIcon.width = "16";
-			tableModuleCommentInnterTableTdDeleteIcon.height = "16";
-			tableModuleCommentInnterTableTdDeleteIcon.style.cursor = "pointer";
-			tableModuleCommentInnterTableTdDeleteIcon.addEventListener("click", (function(constModuleIndex, constCommentIndex) {
-				return function() {
-					return deleteComment(constModuleIndex, constCommentIndex);
-				}
-			})(moduleIndex, index));
+				var tableModuleCommentInnterTableTdDeleteIcon = document.createElement("img");
+				tableModuleCommentInnterTableTdDelete.appendChild(tableModuleCommentInnterTableTdDeleteIcon);
+				tableModuleCommentInnterTableTdDeleteIcon.src = "images/trash.png";
+				tableModuleCommentInnterTableTdDeleteIcon.width = "16";
+				tableModuleCommentInnterTableTdDeleteIcon.height = "16";
+				tableModuleCommentInnterTableTdDeleteIcon.style.cursor = "pointer";
+				tableModuleCommentInnterTableTdDeleteIcon.addEventListener("click", (function (constModuleIndex, constCommentIndex) {
+						return function () {
+							return deleteComment(constModuleIndex, constCommentIndex);
+						}
+					})(moduleIndex, index));
+			}
 		}
 	}
-
 	return divModule;
 }
 
@@ -527,7 +636,28 @@ function getModules() {
 			"opened_only": moduleOpenedOnlyConst,
 			"type": moduleTypeConst
 		},
-		success: function(result) {
+		success: function (result) {
+			today = new Date();
+			today.setHours(0, 0, 0, 0);
+			var month;
+			var days = 0;
+			var totalDaysYear;
+			if ((today.getFullYear() % 4 == 0 && !today.getFullYear() % 100 == 0) || today.getFullYear() % 400 == 0) {
+				for (month = 0; month < today.getMonth(); month++) {
+					days += DAYS_OF_MONTH_LEAP[month];
+				}
+				totalDaysYear = 366;
+			} else {
+				for (month = 0; month < today.getMonth(); month++) {
+					days += DAYS_OF_MONTH[month];
+				}
+				totalDaysYear = 365;
+			}
+			days += today.getDate();
+			var halfTotalDaysYear = Math.floor(totalDaysYear / 2);
+			var hue = Math.abs(((days + 10) % totalDaysYear) - halfTotalDaysYear) * 240 / halfTotalDaysYear;
+			console.log(hue);
+
 			var modulePanel = document.getElementById("modulePanel");
 			var newModulePanel = document.createElement("div");
 			newModulePanel.id = "modulePanel";
@@ -539,7 +669,7 @@ function getModules() {
 				var index;
 				for (index = 0; index < modules.length; index++) {
 					module = modules[index];
-					var table = createModuleTable(module, index);
+					var table = createModuleTable(module, index, hue);
 					newModulePanel.appendChild(table);
 				}
 				modulePanel.parentNode.replaceChild(newModulePanel, modulePanel);

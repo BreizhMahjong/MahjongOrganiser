@@ -6,10 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Breizh Mahjong Organizer</title>
+<title>Breizh Mahjong Voutch</title>
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
 <link href="css/modulestyle.css" rel="stylesheet">
+<link rel="icon" type="image/png" href="calendar.png">
 
 </head>
 <body>
@@ -35,9 +36,7 @@ if(isset($_COOKIE[COOKIE_NAME_ID])) {
 
 if(isset($_GET["menu"])) {
 	$menu = $_GET["menu"];
-	if(!$isLogin && $menu !== "meeting") {
-		$menu = "meeting";
-	} else if(!$isAdmin && $menu !== "event" && $menu !== "meeting") {
+	if(!$isAdmin && $menu !== "meeting" && $menu !== "event") {
 		$menu = "meeting";
 	} else if($isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "event" && $menu !== "meeting") {
 		$menu = "meeting";
@@ -81,7 +80,7 @@ if(isset($_GET["menu"])) {
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
-						} else if($isLogin) {
+						} else {
 							if($menu === "event") {
 								echo "<li class=\"active\"><a href=\"?menu=event\">Evenement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
@@ -89,8 +88,6 @@ if(isset($_GET["menu"])) {
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
-						} else {
-							echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 						}
 						?>
 					</ul>
@@ -143,9 +140,7 @@ if(isset($_GET["menu"])) {
 	</div>
 
 	<footer>
-		<p align="center">
-			Authors : Pierric Willemet, Yulong Zhao @ <a href="https://breizhmahjong.fr/">Breizh Mahjong</a>
-
+		<p align="center">Authors : Pierric Willemet, Yulong Zhao @ <a href="https://breizhmahjong.fr/">Breizh Mahjong</a>
 	</footer>
 
 	<div id="modal" class="popupContainer">
