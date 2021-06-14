@@ -156,13 +156,13 @@ function deleteParticipation(moduleIndex, partIndex) {
 function addComment(moduleIndex) {
 	var comment = {
 		"module_id": modules[moduleIndex].id,
-		"comment_name": moduleElements[moduleIndex].commentName.value,
-		"comment_text": moduleElements[moduleIndex].commentText.value
+		"name": moduleElements[moduleIndex].commentName.value,
+		"text": moduleElements[moduleIndex].commentText.value
 	};
 
-	if (comment.comment_name == "") {
+	if (comment.name == "") {
 		window.alert("Le nom ne peut pas être vide");
-	} else if (comment.comment_text == "") {
+	} else if (comment.text == "") {
 		window.alert("Le message ne peut pas être vide");
 	} else {
 		$.ajax({
@@ -187,11 +187,11 @@ function addComment(moduleIndex) {
 function deleteComment(moduleIndex, commentIndex) {
 	var comment = {
 		"module_id": modules[moduleIndex].id,
-		"comment_name": modules[moduleIndex].comments[commentIndex].comment_name,
-		"comment_time": modules[moduleIndex].comments[commentIndex].comment_time
+		"name": modules[moduleIndex].comments[commentIndex].name,
+		"time": modules[moduleIndex].comments[commentIndex].time
 	};
 
-	if (confirm("Etes-vous sûr de supprimer le message du " + comment.comment_name + " ?")) {
+	if (confirm("Etes-vous sûr de supprimer le message du " + comment.name + " ?")) {
 		$.ajax({
 			url: SERVER_QUERY_URL,
 			type: "POST",
@@ -582,43 +582,45 @@ function createModuleTable(module, moduleIndex, hue) {
 			moduleElement.commentText = tableModuleCommentInnterTableTdMessageText;
 
 			for (index = 0; index < module.comments.length; index++) {
-				var tableModuleCommentInnterTableTr = document.createElement("tr");
-				tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
-
-				var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
-				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
-				tableModuleCommentInnterTableTdNameTitle.className = "div-module-comment-table-body-col1";
-
-				var tableModuleCommentInnterTableTdName = document.createElement("td");
-				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
-				tableModuleCommentInnterTableTdName.className = "div-module-comment-table-body-col2";
-				tableModuleCommentInnterTableTdName.innerHTML = module.comments[index].comment_name;
-
-				var tableModuleCommentInnterTableTdTime = document.createElement("td");
-				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdTime);
-				tableModuleCommentInnterTableTdTime.className = "div-module-comment-table-body-col3";
-				tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].comment_time) * 1000).toLocaleDateString("fr-fr", dateTimeOptions);
-
-				var tableModuleCommentInnterTableTdMessage = document.createElement("td");
-				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
-				tableModuleCommentInnterTableTdMessage.className = "div-module-comment-table-body-col4";
-				tableModuleCommentInnterTableTdMessage.innerHTML = module.comments[index].comment_text;
-
-				var tableModuleCommentInnterTableTdDelete = document.createElement("td");
-				tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdDelete);
-				tableModuleCommentInnterTableTdDelete.className = "div-module-comment-table-body-col5";
-
-				var tableModuleCommentInnterTableTdDeleteIcon = document.createElement("img");
-				tableModuleCommentInnterTableTdDelete.appendChild(tableModuleCommentInnterTableTdDeleteIcon);
-				tableModuleCommentInnterTableTdDeleteIcon.src = "images/trash.png";
-				tableModuleCommentInnterTableTdDeleteIcon.width = "16";
-				tableModuleCommentInnterTableTdDeleteIcon.height = "16";
-				tableModuleCommentInnterTableTdDeleteIcon.style.cursor = "pointer";
-				tableModuleCommentInnterTableTdDeleteIcon.addEventListener("click", (function (constModuleIndex, constCommentIndex) {
-						return function () {
-							return deleteComment(constModuleIndex, constCommentIndex);
-						}
-					})(moduleIndex, index));
+				if(displaySystemMessage == 1 || (displaySystemMessage == 0 && module.comments[index].type == 0)) {
+					var tableModuleCommentInnterTableTr = document.createElement("tr");
+					tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
+	
+					var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
+					tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdNameTitle);
+					tableModuleCommentInnterTableTdNameTitle.className = "div-module-comment-table-body-col1";
+	
+					var tableModuleCommentInnterTableTdName = document.createElement("td");
+					tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdName);
+					tableModuleCommentInnterTableTdName.className = "div-module-comment-table-body-col2";
+					tableModuleCommentInnterTableTdName.innerHTML = module.comments[index].name;
+	
+					var tableModuleCommentInnterTableTdTime = document.createElement("td");
+					tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdTime);
+					tableModuleCommentInnterTableTdTime.className = "div-module-comment-table-body-col3";
+					tableModuleCommentInnterTableTdTime.innerHTML = new Date(parseInt(module.comments[index].time) * 1000).toLocaleDateString("fr-fr", dateTimeOptions);
+	
+					var tableModuleCommentInnterTableTdMessage = document.createElement("td");
+					tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdMessage);
+					tableModuleCommentInnterTableTdMessage.className = "div-module-comment-table-body-col4";
+					tableModuleCommentInnterTableTdMessage.innerHTML = module.comments[index].text;
+	
+					var tableModuleCommentInnterTableTdDelete = document.createElement("td");
+					tableModuleCommentInnterTableTr.appendChild(tableModuleCommentInnterTableTdDelete);
+					tableModuleCommentInnterTableTdDelete.className = "div-module-comment-table-body-col5";
+	
+					var tableModuleCommentInnterTableTdDeleteIcon = document.createElement("img");
+					tableModuleCommentInnterTableTdDelete.appendChild(tableModuleCommentInnterTableTdDeleteIcon);
+					tableModuleCommentInnterTableTdDeleteIcon.src = "images/trash.png";
+					tableModuleCommentInnterTableTdDeleteIcon.width = "16";
+					tableModuleCommentInnterTableTdDeleteIcon.height = "16";
+					tableModuleCommentInnterTableTdDeleteIcon.style.cursor = "pointer";
+					tableModuleCommentInnterTableTdDeleteIcon.addEventListener("click", (function (constModuleIndex, constCommentIndex) {
+							return function () {
+								return deleteComment(constModuleIndex, constCommentIndex);
+							}
+						})(moduleIndex, index));
+				}
 			}
 		}
 	}
@@ -656,7 +658,6 @@ function getModules() {
 			days += today.getDate();
 			var halfTotalDaysYear = Math.floor(totalDaysYear / 2);
 			var hue = Math.abs(((days + 10) % totalDaysYear) - halfTotalDaysYear) * 240 / halfTotalDaysYear;
-			console.log(hue);
 
 			var modulePanel = document.getElementById("modulePanel");
 			var newModulePanel = document.createElement("div");

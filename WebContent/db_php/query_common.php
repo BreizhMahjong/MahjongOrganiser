@@ -27,7 +27,8 @@ define ("PART_PART", "participation");
 
 // Comment
 define ("COMMENT_MODULE_ID", "module_id");
-define ("COMMENT_COMMENT_NAME", "comment_name");
-define ("COMMENT_COMMENT_TEXT", "comment_text");
-define ("COMMENT_COMMENT_TIME", "comment_time");
+define ("COMMENT_NAME", "name");
+define ("COMMENT_TEXT", "text");
+define ("COMMENT_TIME", "time");
+define ("COMMENT_TYPE", "type");
 ?>

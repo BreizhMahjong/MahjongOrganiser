@@ -258,7 +258,7 @@ function purge_closed_module() {
 	return json_encode($result);
 }
 function get_module($nbModules, $openedOnly, $type) {
-	$querySelect = "SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TITLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " FROM " . TABLE_MODULE;
+	$querySelect = "SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TITLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . " FROM " . TABLE_MODULE;
 	$queryWhere = " WHERE 1=1";
 	if($openedOnly) {
 		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ">=CURDATE()";
@@ -279,13 +279,14 @@ function get_module($nbModules, $openedOnly, $type) {
 		$module[MODULE_ID] = $line[TABLE_MODULE_ID];
 		$module[MODULE_TITLE] = $line[TABLE_MODULE_TITLE];
 		$module[MODULE_END_DATE] = $line[TABLE_MODULE_END_DATE];
+		$module[MODULE_TYPE] = $line[TABLE_MODULE_TYPE];
 		$modules[] = $module;
 	}
 
 	$moduleComplets = array ();
 	$queryOption = "SELECT " . TABLE_OPTION . DOT . TABLE_OPTION_POSITION . ", " . TABLE_OPTION . DOT . TABLE_OPTION_TITLE . " FROM " . TABLE_OPTION . " WHERE " . TABLE_OPTION . DOT . TABLE_OPTION_MODULE_ID . "=? ORDER BY " . TABLE_OPTION . DOT . TABLE_OPTION_POSITION . " ASC";
 	$queryPart = "SELECT " . TABLE_PART . DOT . TABLE_PART_NAME . ", " . TABLE_PART . DOT . TABLE_PART_PART . " FROM " . TABLE_PART . " WHERE " . TABLE_PART . DOT . TABLE_PART_MODULE_ID . "=? ORDER BY " . TABLE_PART . DOT . TABLE_PART_TIME . " DESC";
-	$queryCmt = "SELECT " . TABLE_CMT . DOT . TABLE_CMT_NAME . ", " . TABLE_CMT . DOT . TABLE_CMT_TEXT . ", UNIX_TIMESTAMP(" . TABLE_CMT . DOT . TABLE_CMT_TIME . ") AS " . TABLE_CMT_UTIME . " FROM " . TABLE_CMT . " WHERE " . TABLE_CMT . DOT . TABLE_CMT_MODULE_ID . "=? ORDER BY " . TABLE_CMT . DOT . TABLE_CMT_TIME . " ASC";
+	$queryCmt = "SELECT " . TABLE_CMT . DOT . TABLE_CMT_NAME . ", " . TABLE_CMT . DOT . TABLE_CMT_TEXT . ", UNIX_TIMESTAMP(" . TABLE_CMT . DOT . TABLE_CMT_TIME . ") AS " . TABLE_CMT_UTIME . ", " . TABLE_CMT . DOT . TABLE_CMT_TYPE . " FROM " . TABLE_CMT . " WHERE " . TABLE_CMT . DOT . TABLE_CMT_MODULE_ID . "=? ORDER BY " . TABLE_CMT . DOT . TABLE_CMT_TIME . " ASC";
 	foreach($modules as $module) {
 		$parameters = array (
 			$module[MODULE_ID]
@@ -317,9 +318,10 @@ function get_module($nbModules, $openedOnly, $type) {
 		foreach($result as $line) {
 			$comment = array ();
 			$comment[COMMENT_MODULE_ID] = $module[MODULE_ID];
-			$comment[COMMENT_COMMENT_NAME] = $line[TABLE_CMT_NAME];
-			$comment[COMMENT_COMMENT_TEXT] = $line[TABLE_CMT_TEXT];
-			$comment[COMMENT_COMMENT_TIME] = $line[TABLE_CMT_UTIME];
+			$comment[COMMENT_NAME] = $line[TABLE_CMT_NAME];
+			$comment[COMMENT_TEXT] = $line[TABLE_CMT_TEXT];
+			$comment[COMMENT_TIME] = $line[TABLE_CMT_UTIME];
+			$comment[COMMENT_TYPE] = $line[TABLE_CMT_TYPE];
 			$comments[] = $comment;
 		}
 		$module[MODULE_COMMENTS] = $comments;

@@ -1,6 +1,7 @@
 <?php
 require_once ("query_database_connection.php");
 require_once ("query_database_table_part.php");
+require_once ("query_database_table_cmt.php");
 require_once ("query_scheduler_part_config.php");
 
 function new_part($part) {
@@ -24,6 +25,17 @@ function new_part($part) {
 				$participation
 			);
 			$added = executeUpdate($query, $parameters);
+
+			if($added) {
+				$query = "INSERT INTO " . TABLE_CMT . "(" . TABLE_CMT_MODULE_ID . ", " . TABLE_CMT_NAME . ", " . TABLE_CMT_TEXT . ", " . TABLE_CMT_TYPE . ") VALUES(?, ?, ?, 1)";
+				$parameters = array(
+					$id,
+					$name,
+					$name . " a voutché."
+				);
+				$added = executeUpdate($query, $parameters);
+			}
+
 			if($added) {
 				commit();
 			} else {
@@ -64,6 +76,7 @@ function modify_part($part) {
 				$name
 			);
 			$modified = executeUpdate($query, $parameters);
+
 			if($modified) {
 				commit();
 			} else {
@@ -100,8 +113,19 @@ function delete_part($part) {
 				$id,
 				$name
 			);
-			$modified = executeUpdate($query, $parameters);
-			if($modified) {
+			$deleted = executeUpdate($query, $parameters);
+
+			if($deleted) {
+				$query = "INSERT INTO " . TABLE_CMT . "(" . TABLE_CMT_MODULE_ID . ", " . TABLE_CMT_NAME . ", " . TABLE_CMT_TEXT . ", " . TABLE_CMT_TYPE . ") VALUES(?, ?, ?, 1)";
+				$parameters = array(
+					$id,
+					$name,
+					$name . " a doutché."
+				);
+				$deleted = executeUpdate($query, $parameters);
+			}
+
+			if($deleted) {
 				commit();
 			} else {
 				rollBack();

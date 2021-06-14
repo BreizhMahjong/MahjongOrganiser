@@ -10,7 +10,7 @@
 <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
 <link href="css/modulestyle.css" rel="stylesheet">
-<link rel="icon" type="image/png" href="calendar.png">
+<link rel="icon" type="image/png" href="images/calendar.png">
 
 </head>
 <body>
@@ -172,9 +172,11 @@ if(isset($_GET["menu"])) {
 	if($isAdmin) {
 		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=0</script>";
 		echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
+		echo "<script type=\"text/javascript\">var displaySystemMessage=1</script>";
 	} else {
 		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=1</script>";
 		echo "<script type=\"text/javascript\">var moduleLimitConst=5</script>";
+		echo "<script type=\"text/javascript\">var displaySystemMessage=0</script>";
 	}
 	if($menu === "meeting") {
 		echo "<script type=\"text/javascript\">var moduleTypeConst=0</script>";

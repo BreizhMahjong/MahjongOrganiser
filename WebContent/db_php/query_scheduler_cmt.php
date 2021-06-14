@@ -11,12 +11,12 @@ function new_comment($comment) {
 	if ($comment !== null) {
 		$commentArray = json_decode($comment, true);
 		$id = array_key_exists(COMMENT_MODULE_ID, $commentArray) ? $commentArray[COMMENT_MODULE_ID] : null;
-		$name = array_key_exists(COMMENT_COMMENT_NAME, $commentArray) ? $commentArray[COMMENT_COMMENT_NAME] : null;
-		$text = array_key_exists(COMMENT_COMMENT_TEXT, $commentArray) ? $commentArray[COMMENT_COMMENT_TEXT] : null;
+		$name = array_key_exists(COMMENT_NAME, $commentArray) ? $commentArray[COMMENT_NAME] : null;
+		$text = array_key_exists(COMMENT_TEXT, $commentArray) ? $commentArray[COMMENT_TEXT] : null;
 
 		if ($id !== null && $name !== null && $text !== null) {
 			beginTransaction();
-			$query = "INSERT INTO " . TABLE_CMT . "(" . TABLE_CMT_MODULE_ID . ", " . TABLE_CMT_NAME . ", " . TABLE_CMT_TEXT . ") VALUES(?, ?, ?)";
+			$query = "INSERT INTO " . TABLE_CMT . "(" . TABLE_CMT_MODULE_ID . ", " . TABLE_CMT_NAME . ", " . TABLE_CMT_TEXT . ", " . TABLE_CMT_TYPE . ") VALUES(?, ?, ?, 0)";
 			$parameters = array(
 				$id,
 				$name,
@@ -49,8 +49,8 @@ function delete_comment($comment) {
 	if ($comment !== null) {
 		$commentArray = json_decode($comment, true);
 		$id = array_key_exists(COMMENT_MODULE_ID, $commentArray) ? intval($commentArray[COMMENT_MODULE_ID]) : null;
-		$name = array_key_exists(COMMENT_COMMENT_NAME, $commentArray) ? $commentArray[COMMENT_COMMENT_NAME] : null;
-		$date = array_key_exists(COMMENT_COMMENT_TIME, $commentArray) ? $commentArray[COMMENT_COMMENT_TIME] : null;
+		$name = array_key_exists(COMMENT_NAME, $commentArray) ? $commentArray[COMMENT_NAME] : null;
+		$date = array_key_exists(COMMENT_TIME, $commentArray) ? $commentArray[COMMENT_TIME] : null;
 
 		if ($id !== null && $name !== null && $date !== null) {
 			beginTransaction();

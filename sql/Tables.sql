@@ -25,8 +25,9 @@ CREATE TABLE bmjs_module_participation (
 
 CREATE TABLE bmjs_module_comment (
 	module_id		integer unsigned not null,
-	comment_name	varchar(16) not null,
-	comment_text	varchar(256) not null,
-	comment_time	datetime not null default current_timestamp,
+	name			varchar(16) not null,
+	text			varchar(256) not null,
+	time			datetime not null default current_timestamp,
+	type			tinyint unsigned not null default 0,
 	constraint		bmc_module_id_fk foreign key(module_id) references bmjs_module(id) on delete cascade on update restrict
 );
