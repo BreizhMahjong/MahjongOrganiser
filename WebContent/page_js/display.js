@@ -636,6 +636,7 @@ function getModules() {
 			"action": "get_module",
 			"nb_modules": moduleLimitConst,
 			"opened_only": moduleOpenedOnlyConst,
+			"within_days": moduleWithinDaysConst,
 			"type": moduleTypeConst
 		},
 		success: function (result) {

@@ -37,10 +37,11 @@ if($action !== null) {
 			echo purge_closed_module();
 			break;
 		case ACTION_GET_MODULE:
-			$nb_modules = isset($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) ? intval($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) : null;
-			$opened_only = isset($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) ? boolval($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) : null;
-			$type = isset($_POST[ACTION_GET_MODULE_PARAM_TYPE]) ? intval($_POST[ACTION_GET_MODULE_PARAM_TYPE]) : null;
-			echo get_module($nb_modules, $opened_only, $type);
+			$nb_modules = isset($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) ? intval($_POST[ACTION_GET_MODULE_PARAM_NB_MODULES]) : 0;
+			$opened_only = isset($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) ? boolval($_POST[ACTION_GET_MODULE_PARAM_OPENED_ONLY]) : true;
+			$withinDays =  isset($_POST[ACTION_GET_MODULE_PARAM_WITHIN_DAYS]) ? intval($_POST[ACTION_GET_MODULE_PARAM_WITHIN_DAYS]) : 0;
+			$type = isset($_POST[ACTION_GET_MODULE_PARAM_TYPE]) ? intval($_POST[ACTION_GET_MODULE_PARAM_TYPE]) : 1;
+			echo get_module($nb_modules, $opened_only, $withinDays, $type);
 			break;
 		case ACTION_NEW_PART:
 			$part = isset($_POST[ACTION_NEW_PART_PARAM_PART]) ? $_POST[ACTION_NEW_PART_PARAM_PART] : null;

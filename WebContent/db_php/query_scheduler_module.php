@@ -257,11 +257,14 @@ function purge_closed_module() {
 	}
 	return json_encode($result);
 }
-function get_module($nbModules, $openedOnly, $type) {
+function get_module($nbModules, $openedOnly, $withinDays, $type) {
 	$querySelect = "SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TITLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . " FROM " . TABLE_MODULE;
 	$queryWhere = " WHERE 1=1";
 	if($openedOnly) {
-		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ">=CURDATE()";
+		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ">=CURRENT_DATE()";
+	}
+	if($withinDays > 0) {
+		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . "<DATE_ADD(CURRENT_DATE(), INTERVAL " . $withinDays . " DAY)";
 	}
 	if($type >= 0) {
 		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . "=" . $type;

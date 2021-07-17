@@ -23,6 +23,7 @@ define("ACTION_PURGE_CLOSED_MODULE", "purge_closed_module");
 define("ACTION_GET_MODULE", "get_module");
 define("ACTION_GET_MODULE_PARAM_NB_MODULES", "nb_modules");
 define("ACTION_GET_MODULE_PARAM_OPENED_ONLY", "opened_only");
+define("ACTION_GET_MODULE_PARAM_WITHIN_DAYS", "within_days");
 define("ACTION_GET_MODULE_PARAM_TYPE", "type");
 
 define("ACTION_NEW_PART", "new_part");

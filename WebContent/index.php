@@ -172,20 +172,33 @@ if(isset($_GET["menu"])) {
 	if($isAdmin) {
 		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=0</script>";
 		echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
+		echo "<script type=\"text/javascript\">var moduleWithinDaysConst=0</script>";
 		echo "<script type=\"text/javascript\">var displaySystemMessage=1</script>";
+		if($menu === "meeting") {
+			echo "<script type=\"text/javascript\">var moduleTypeConst=0</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else if($menu === "event") {
+			echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else {
+			echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";
+		}
 	} else {
 		echo "<script type=\"text/javascript\">var moduleOpenedOnlyConst=1</script>";
-		echo "<script type=\"text/javascript\">var moduleLimitConst=5</script>";
 		echo "<script type=\"text/javascript\">var displaySystemMessage=0</script>";
-	}
-	if($menu === "meeting") {
-		echo "<script type=\"text/javascript\">var moduleTypeConst=0</script>";
-		echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
-	} else if($menu === "event") {
-		echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
-		echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
-	} else {
-		echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";
+		if($menu === "meeting") {
+			echo "<script type=\"text/javascript\">var moduleLimitConst=5</script>";
+			echo "<script type=\"text/javascript\">var moduleWithinDaysConst=30</script>";
+			echo "<script type=\"text/javascript\">var moduleTypeConst=0</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else if($menu === "event") {
+			echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
+			echo "<script type=\"text/javascript\">var moduleWithinDaysConst=0</script>";
+			echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else {
+			echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";
+		}
 	}
 	?>
 </body>
