@@ -8,8 +8,30 @@ var elementButtonDelete;
 var elementButtonPurge;
 
 var elementDate;
+var elementRegisterDate;
+var elementAvailable;
+var elementSticky;
 var elementTitle;
+var elementDescription;
 var elementInputOptions;
+
+function dateChanged() {
+	var dateDate = elementDate.valueAsDate;
+	var registerDate = elementRegisterDate.valueAsDate;
+	if (dateDate.getTime() < registerDate.getTime()) {
+		elementRegisterDate.value = elementDate.value;
+		window.alert("La date choisie est antérieure que la date fin d'inscription");
+	}
+}
+
+function registerDateChanged() {
+	var dateDate = elementDate.valueAsDate;
+	var registerDate = elementRegisterDate.valueAsDate;
+	if (dateDate.getTime() < registerDate.getTime()) {
+		elementDate.value = elementRegisterDate.value;
+		window.alert("La date fin d'inscription choisie est postérieure que la date");
+	}
+}
 
 function displayModule() {
 	if (modules != null && modules.length > 0) {
@@ -17,7 +39,11 @@ function displayModule() {
 		var module = modules[selectModule.selectedIndex];
 
 		elementTitle.value = module.title;
-		elementDate.value = module.end_date;
+		elementDescription.value = module.description;
+		elementDate.value = module.event_date;
+		elementRegisterDate.value = module.register_end_date;
+		elementAvailable.value = module.available;
+		elementSticky.checked = module.sticky == 1;
 
 		for (index = 0; index < module.options.length; index++) {
 			elementTROptions[index].style.display = "table-row";
@@ -60,7 +86,11 @@ function modifyModule() {
 		}
 
 		module.title = elementTitle.value;
-		module.end_date = elementDate.value;
+		module.available = elementAvailable.value;
+		module.sticky = elementSticky.checked ? 1 : 0;
+		module.event_date = elementDate.value;
+		module.register_end_date = elementRegisterDate.value;
+		module.description = elementDescription.value;
 
 		for (index = 0; index < module.options.length; index++) {
 			module.options[index].title = elementInputOptions[index].value;
@@ -112,11 +142,17 @@ function duplicateModule() {
 		}
 
 		module.title = elementTitle.value;
-		module.end_date = elementDate.value;
+		module.available = elementAvailable.value;
+		module.sticky = elementSticky.checked ? 1 : 0;
+		module.event_date = elementDate.value;
+		module.register_end_date = elementRegisterDate.value;
+		module.description = elementDescription.value;
 
 		for (index = 0; index < module.options.length; index++) {
 			module.options[index].title = elementInputOptions[index].value;
 		}
+		
+		console.log(module);
 
 		$.ajax({
 			url: SERVER_QUERY_URL,
@@ -205,11 +241,19 @@ function getModules() {
 			"type": -1
 		},
 		success: function(result) {
+			var dateOptions = {
+				year: "numeric",
+				month: "long",
+				day: "2-digit",
+				weekday: "long"
+			};
+			
 			modules = $.parseJSON(result);
 			selectModule.options.length = 0;
 			for (index = 0; index < modules.length; index++) {
+				var moduleEventDate = new Date(modules[index].event_date);
 				var option = document.createElement("option");
-				option.innerHTML = modules[index].title;
+				option.innerHTML = moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + " : " + modules[index].title;
 				selectModule.appendChild(option);
 			}
 			hideLoading();
@@ -224,7 +268,12 @@ function prepare() {
 	elementSelectModule = document.getElementById("selectModule");
 
 	elementDate = document.getElementById("moduleDate");
+	elementRegisterDate = document.getElementById("moduleRegisterDate");
+	elementAvailable = document.getElementById("moduleAvailable");
+	elementSticky = document.getElementById("moduleSticky");
 	elementTitle = document.getElementById("moduleTitle");
+	elementDescription = document.getElementById("moduleDescription");
+
 	elementInputOptions = new Array();
 	elementInputOptions.push(document.getElementById("moduleOption1"));
 	elementInputOptions.push(document.getElementById("moduleOption2"));

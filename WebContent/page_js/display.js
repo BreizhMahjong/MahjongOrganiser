@@ -122,7 +122,11 @@ function cancelModifyParticipation(moduleIndex) {
 		moduleElements[moduleIndex].optionImages[optionIndex].src = "images/unchecked.png";
 	}
 
-	moduleElements[moduleIndex].addParticipationButton.style.display = "";
+	if(moduleElement.register_open) {
+		moduleElements[moduleIndex].addParticipationButton.style.display = "";
+	} else {
+		moduleElements[moduleIndex].addParticipationButton.style.display = "none";
+	} 
 	moduleElements[moduleIndex].saveModifyParticipationButton.style.display = "none";
 	moduleElements[moduleIndex].cancelModifyParticipationButton.style.display = "none";
 }
@@ -262,6 +266,10 @@ function createModuleTable(module, moduleIndex, hue) {
 		participationsOption.push(participationOption);
 	}
 
+	var moduleEventDate = new Date(module.event_date);
+	var moduleRegisterDate = new Date(module.register_end_date);
+	moduleElement.register_open = moduleRegisterDate.getTime() >= today.getTime();
+
 	var divModule = document.createElement("div");
 	divModule.className = "div-module";
 
@@ -269,27 +277,21 @@ function createModuleTable(module, moduleIndex, hue) {
 		var divModuleTitle = document.createElement("div");
 		divModule.appendChild(divModuleTitle);
 		divModuleTitle.className = "div-module-title";
-		divModuleTitle.style.background = "hsl(" + hue + ", 100%, 98.5%)";
+		divModuleTitle.style.background = "hsl(" + hue + ", 100%, 95%)";
 		divModuleTitle.addEventListener("click", (function (constModuleId) {
 				return function () {
 					toggleModuleBody(constModuleId);
 				}
 			})(module.id));
-		var divModuleTitleDate = document.createElement("div");
-		divModuleTitle.appendChild(divModuleTitleDate);
-		var moduleEndDate = new Date(module.end_date);
-		if (moduleEndDate.getTime() >= today.getTime()) {
-			divModuleTitleDate.className = "div-module-title-date";
-			divModuleTitleDate.innerHTML = "Date : " + moduleEndDate.toLocaleDateString("fr-fr", dateOptions);
-		} else {
-			divModuleTitleDate.className = "div-module-title-date-closed";
-			divModuleTitleDate.innerHTML = "Date : " + moduleEndDate.toLocaleDateString("fr-fr", dateOptions) + " (fermé)";
-		}
 
 		var divModuleTitleTitle = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleTitle);
-		divModuleTitleTitle.className = "div-module-title-title";
 		divModuleTitleTitle.innerHTML = module.title;
+		if (moduleEventDate.getTime() >= today.getTime()) {
+			divModuleTitleTitle.className = "div-module-title-title";
+		} else {
+			divModuleTitleTitle.className = "div-module-title-title-closed";
+		}
 
 		var divModuleTitleIcon = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleIcon);
@@ -309,12 +311,32 @@ function createModuleTable(module, moduleIndex, hue) {
 		divModuleFoldable.className = "div-module-foldable";
 		divModuleFoldable.id = "div_" + module.id;
 		divModuleFoldable.style.display = "none";
+		
+		{			
+			var divModuleDescription = document.createElement("div");
+			divModuleFoldable.appendChild(divModuleDescription);
+			divModuleDescription.className = "div-module-description";
+			divModuleDescription.style.background = "hsl(" + (hue + 30) + ", 100%, 90%)";
+			
+			var subTitle;
+			if (module.type == 0) {
+				subTitle = "Séance " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". ";
+			} else if(module.type == 1) {
+				subTitle = "Événement " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". ";
+			}
+			subTitle = subTitle + "Inscription avant " + moduleRegisterDate.toLocaleDateString("fr-fr", dateOptions) + ".<br>";
+			
+			if (module.description != null && module.description != "") {
+				subTitle = subTitle + "Description : " + module.description;
+			}
+			divModuleDescription.innerHTML = subTitle;
+		}
 
 		{
 			var divModulePart = document.createElement("div");
 			divModuleFoldable.appendChild(divModulePart);
 			divModulePart.className = "div-module-part";
-			divModulePart.style.background = "hsl(" + (hue + 30) + ", 100%, 98.5%)";
+			divModulePart.style.background = "hsl(" + (hue + 30) + ", 100%, 95%)";
 			divModulePart.style.height = ((module.options.length + 2) * 48 + 20) + "px";
 			var divModulePartRight = document.createElement("div");
 			divModulePart.appendChild(divModulePartRight);
@@ -398,13 +420,27 @@ function createModuleTable(module, moduleIndex, hue) {
 
 			var divModulePartLeftTotalSpaceTop = document.createElement("div");
 			divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalSpaceTop);
-			divModulePartLeftTotalSpaceTop.className = "div-module-part-left-nbpart-cell";
+			divModulePartLeftTotalSpaceTop.className = "div-module-part-left-nbpart-cell-normal";
 
-			for (index = 0; index < module.options.length; index++) {
-				var divModulePartLeftTotalOption = document.createElement("div");
-				divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalOption);
-				divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell";
-				divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString();
+			if (module.available == 0) {
+				for (index = 0; index < module.options.length; index++) {
+					var divModulePartLeftTotalOption = document.createElement("div");
+					divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalOption);
+					divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-normal";
+					divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString();
+				}
+			} else {
+				for (index = 0; index < module.options.length; index++) {
+					var divModulePartLeftTotalOption = document.createElement("div");
+					divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalOption);
+					if (participationsOption[index] > module.available) {
+						divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-overbooked";
+						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString() + " / " + module.available.toString();
+					} else {
+						divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-normal";
+						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString() + " / " + module.available.toString();
+					}
+				}
 			}
 
 			divModulePartLeftTotalSpaceBottom = document.createElement("div");
@@ -482,11 +518,14 @@ function createModuleTable(module, moduleIndex, hue) {
 			divModulePartLeftNewPartIconImg.height = "16";
 			divModulePartLeftNewPartIconImg.style.cursor = "pointer";
 			divModulePartLeftNewPartIconImg.style.margin = "0px 8px";
+			if(!moduleElement.register_open) {
+				divModulePartLeftNewPartIconImg.style.display = "none";
+			}
 			divModulePartLeftNewPartIconImg.addEventListener("click", (function (constModuleIndex) {
 					return function () {
 						addParticipation(constModuleIndex);
 					}
-				})(moduleIndex));
+				})(moduleIndex));			
 			moduleElement.addParticipationButton = divModulePartLeftNewPartIconImg;
 
 			var divModulePartLeftModifyPartIconImg = document.createElement("img");
@@ -524,11 +563,12 @@ function createModuleTable(module, moduleIndex, hue) {
 			var divModuleComment = document.createElement("div");
 			divModuleFoldable.appendChild(divModuleComment);
 			divModuleComment.className = "div-module-comment";
-			divModuleComment.style.background = "hsl(" + (hue + 60) + ", 100%, 98.5%)";
+			// divModuleComment.style.background = "hsl(" + (hue + 60) + ", 100%, 95%)";
 			var tableModuleCommentInnerTable = document.createElement("table");
 			divModuleComment.appendChild(tableModuleCommentInnerTable);
 			tableModuleCommentInnerTable.className = "div-module-comment-table";
 			var tableModuleCommentInnterTableTr = document.createElement("tr");
+			tableModuleCommentInnterTableTr.style.background = "hsl(" + (hue + 60) + ", 100%, 90%)";
 			tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
 
 			var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");
@@ -584,6 +624,7 @@ function createModuleTable(module, moduleIndex, hue) {
 			for (index = 0; index < module.comments.length; index++) {
 				if(displaySystemMessage == 1 || (displaySystemMessage == 0 && module.comments[index].type == 0)) {
 					var tableModuleCommentInnterTableTr = document.createElement("tr");
+					tableModuleCommentInnterTableTr.style.background = "hsl(" + (hue + 60) + ", 100%, 95%)";
 					tableModuleCommentInnerTable.appendChild(tableModuleCommentInnterTableTr);
 	
 					var tableModuleCommentInnterTableTdNameTitle = document.createElement("td");

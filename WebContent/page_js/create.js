@@ -4,9 +4,35 @@ var elementButtonCreate;
 var elementButtonReset;
 
 var elementType;
+var elementAvailable;
 var elementDate;
+var elementRegisterDate;
+var elementSticky;
 var elementTitle;
+var elementDescription;
 var elementInputOptions;
+
+function dateChanged() {
+	var dateDate = elementDate.valueAsDate;
+	var registerDate = elementRegisterDate.valueAsDate;
+	if (dateDate !== null && registerDate !== null) {
+		if (dateDate.getTime() < registerDate.getTime()) {
+			elementRegisterDate.value = elementDate.value;
+			window.alert("La date choisie est antérieure que la date fin d'inscription");
+		}
+	}
+}
+
+function registerDateChanged() {
+	var dateDate = elementDate.valueAsDate;
+	var registerDate = elementRegisterDate.valueAsDate;
+	if (dateDate !== null && registerDate !== null) {
+		if (dateDate.getTime() < registerDate.getTime()) {
+			elementDate.value = elementRegisterDate.value;
+			window.alert("La date fin d'inscription choisie est postérieure que la date");
+		}
+	}
+}
 
 function toggleOptions() {
 	var index;
@@ -30,12 +56,16 @@ function addModule() {
 		return;
 	}
 	var date = elementDate.value;
+	var registerDate = elementRegisterDate.value;
+	var available = elementAvailable.value;
+	var sticky = elementSticky.checked ? 1 : 0;
 
 	var title = elementTitle.value;
 	if (title == "") {
 		window.alert("Le titre du module est vide");
 		return;
-	}
+	}	
+	var description = elementDescription.value;
 
 	var options = new Array();
 	for (index = 0; index < nbOptions; index++) {
@@ -52,8 +82,12 @@ function addModule() {
 
 	var module = {
 		"title": title,
-		"end_date": date,
+		"description": description,
+		"event_date": date,
+		"register_end_date": registerDate,
 		"type": elementType.options[elementType.selectedIndex].value,
+		"available": available,
+		"sticky": sticky,
 		"options": options
 	}
 
@@ -89,7 +123,11 @@ function reset() {
 function prepare() {
 	elementType = document.getElementById("moduleType");
 	elementDate = document.getElementById("moduleDate");
+	elementRegisterDate = document.getElementById("moduleRegisterDate");
+	elementAvailable = document.getElementById("moduleAvailable");
+	elementSticky = document.getElementById("moduleSticky");
 	elementTitle = document.getElementById("moduleTitle");
+	elementDescription = document.getElementById("moduleDescription");
 	elementInputOptions = new Array();
 	elementInputOptions.push(document.getElementById("moduleOption1"));
 	elementInputOptions.push(document.getElementById("moduleOption2"));

@@ -36,9 +36,11 @@ if(isset($_COOKIE[COOKIE_NAME_ID])) {
 
 if(isset($_GET["menu"])) {
 	$menu = $_GET["menu"];
-	if(!$isAdmin && $menu !== "meeting" && $menu !== "event") {
+	if(!$isLogin && !$isAdmin && $menu !== "meeting") {
 		$menu = "meeting";
-	} else if($isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "event" && $menu !== "meeting") {
+	} else if($isLogin && !$isAdmin && $menu !== "meeting" && $menu !== "event") {
+		$menu = "meeting";
+	} else if($isLogin && $isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "event" && $menu !== "meeting") {
 		$menu = "meeting";
 	}
 } else {
@@ -80,12 +82,16 @@ if(isset($_GET["menu"])) {
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
-						} else {
+						} else if($isLogin) {
 							if($menu === "event") {
 								echo "<li class=\"active\"><a href=\"?menu=event\">Evenement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
 							} else if($menu === "meeting") {
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
+							}
+						} else {
+							if($menu === "meeting") {
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
 						}

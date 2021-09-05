@@ -15,17 +15,29 @@ function new_module($module) {
 		if($module !== null) {
 			$moduleArray = json_decode($module, true);
 			$title = array_key_exists(MODULE_TITLE, $moduleArray) ? $moduleArray[MODULE_TITLE] : null;
-			$end_date = array_key_exists(MODULE_END_DATE, $moduleArray) ? $moduleArray[MODULE_END_DATE] : null;
+			$description = array_key_exists(MODULE_DESCRIPTION, $moduleArray) ? $moduleArray[MODULE_DESCRIPTION] : null;
+			$available = array_key_exists(MODULE_AVAILABLE, $moduleArray) ? intval($moduleArray[MODULE_AVAILABLE]) : 0;
+			$event_date = array_key_exists(MODULE_EVENT_DATE, $moduleArray) ? $moduleArray[MODULE_EVENT_DATE] : null;
+			$register_end_date = array_key_exists(MODULE_REGISTER_END_DATE, $moduleArray) ? $moduleArray[MODULE_REGISTER_END_DATE] : null;
 			$type = array_key_exists(MODULE_TYPE, $moduleArray) ? intval($moduleArray[MODULE_TYPE]) : 0;
+			$sticky = array_key_exists(MODULE_STICKY, $moduleArray) ? intval($moduleArray[MODULE_STICKY]) : 0;
 			$options = array_key_exists(MODULE_OPTIONS, $moduleArray) ? $moduleArray[MODULE_OPTIONS] : null;
 
-			if($title !== null && $end_date !== null && $options !== null) {
+			if($title !== null && $event_date !== null && $options !== null) {
+				if($register_end_date == null) {
+					$register_end_date = $event_date;
+				}
+
 				beginTransaction();
-				$query = "INSERT INTO " . TABLE_MODULE . "(" . TABLE_MODULE_TITLE . ", " . TABLE_MODULE_END_DATE . ", " . TABLE_MODULE_TYPE . ") VALUES(?, ?, ?)";
+				$query = "INSERT INTO " . TABLE_MODULE . "(" . TABLE_MODULE_TITLE . ", " . TABLE_MODULE_DESCRIPTION . ", " . TABLE_MODULE_AVAILABLE . ", " . TABLE_MODULE_EVENT_DATE . ", " . TABLE_MODULE_REGISTER_END_DATE . ", " . TABLE_MODULE_TYPE . ", " . TABLE_MODULE_STICKY . ") VALUES(?, ?, ?, ?, ?, ?, ?)";
 				$parameters = array (
 					$title,
-					$end_date,
-					$type
+					$description,
+					$available,
+					$event_date,
+					$register_end_date,
+					$type,
+					$sticky
 				);
 
 				$id = executeInsert($query, $parameters);
@@ -93,15 +105,27 @@ function modify_module($module) {
 			$moduleArray = json_decode($module, true);
 			$id = array_key_exists(MODULE_ID, $moduleArray) ? $moduleArray[MODULE_ID] : null;
 			$title = array_key_exists(MODULE_TITLE, $moduleArray) ? $moduleArray[MODULE_TITLE] : null;
-			$end_date = array_key_exists(MODULE_END_DATE, $moduleArray) ? $moduleArray[MODULE_END_DATE] : null;
+			$description = array_key_exists(MODULE_DESCRIPTION, $moduleArray) ? $moduleArray[MODULE_DESCRIPTION] : null;
+			$available = array_key_exists(MODULE_AVAILABLE, $moduleArray) ? intval($moduleArray[MODULE_AVAILABLE]) : 0;
+			$event_date = array_key_exists(MODULE_EVENT_DATE, $moduleArray) ? $moduleArray[MODULE_EVENT_DATE] : null;
+			$register_end_date = array_key_exists(MODULE_REGISTER_END_DATE, $moduleArray) ? $moduleArray[MODULE_REGISTER_END_DATE] : null;
+			$sticky = array_key_exists(MODULE_STICKY, $moduleArray) ? intval($moduleArray[MODULE_STICKY]) : 0;
 			$options = array_key_exists(MODULE_OPTIONS, $moduleArray) ? $moduleArray[MODULE_OPTIONS] : null;
 
-			if($title !== null && $end_date !== null) {
+			if($title !== null && $event_date !== null) {
+				if($register_end_date == null) {
+					$register_end_date = $event_date;
+				}
+
 				beginTransaction();
-				$query = "UPDATE " . TABLE_MODULE . " SET " . TABLE_MODULE_TITLE . "=?, " . TABLE_MODULE_END_DATE . "=? WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_ID . "=?";
+				$query = "UPDATE " . TABLE_MODULE . " SET " . TABLE_MODULE_TITLE . "=?, " . TABLE_MODULE_DESCRIPTION . "=?, " . TABLE_MODULE_AVAILABLE . "=?, " . TABLE_MODULE_EVENT_DATE . "=?, " . TABLE_MODULE_REGISTER_END_DATE . "=?, " . TABLE_MODULE_STICKY . "=? WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_ID . "=?";
 				$parameters = array (
 					$title,
-					$end_date,
+					$description,
+					$available,
+					$event_date,
+					$register_end_date,
+					$sticky,
 					$id
 				);
 				$updated = executeUpdate($query, $parameters);
@@ -226,21 +250,21 @@ function purge_closed_module() {
 
 	if(isset($_SESSION[SESSION_IS_ADMIN]) && $_SESSION[SESSION_IS_ADMIN]) {
 		beginTransaction();
-		$query = "DELETE FROM " . TABLE_CMT . " WHERE " . TABLE_CMT . DOT . TABLE_CMT_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " < CURDATE())";
+		$query = "DELETE FROM " . TABLE_CMT . " WHERE " . TABLE_CMT . DOT . TABLE_CMT_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . " < CURDATE())";
 		$deleted = executeUpdate($query, null);
 
 		if($deleted) {
-			$query = "DELETE FROM " . TABLE_PART . " WHERE " . TABLE_PART . DOT . TABLE_PART_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " < CURDATE())";
+			$query = "DELETE FROM " . TABLE_PART . " WHERE " . TABLE_PART . DOT . TABLE_PART_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . " < CURDATE())";
 			$deleted = executeUpdate($query, null);
 		}
 
 		if($deleted) {
-			$query = "DELETE FROM " . TABLE_OPTION . " WHERE " . TABLE_OPTION . DOT . TABLE_OPTION_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " < CURDATE())";
+			$query = "DELETE FROM " . TABLE_OPTION . " WHERE " . TABLE_OPTION . DOT . TABLE_OPTION_MODULE_ID . " IN (SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . " FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . " < CURDATE())";
 			$deleted = executeUpdate($query, null);
 		}
 
 		if($deleted) {
-			$query = "DELETE FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " < CURDATE()";
+			$query = "DELETE FROM " . TABLE_MODULE . " WHERE " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . " < CURDATE()";
 			$deleted = executeUpdate($query, null);
 		}
 
@@ -258,18 +282,18 @@ function purge_closed_module() {
 	return json_encode($result);
 }
 function get_module($nbModules, $openedOnly, $withinDays, $type) {
-	$querySelect = "SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TITLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . " FROM " . TABLE_MODULE;
+	$querySelect = "SELECT " . TABLE_MODULE . DOT . TABLE_MODULE_ID . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TITLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_DESCRIPTION . ", " . TABLE_MODULE . DOT . TABLE_MODULE_AVAILABLE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_REGISTER_END_DATE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . ", " . TABLE_MODULE . DOT . TABLE_MODULE_STICKY . " FROM " . TABLE_MODULE;
 	$queryWhere = " WHERE 1=1";
 	if($openedOnly) {
-		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . ">=CURRENT_DATE()";
+		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . ">=CURRENT_DATE()";
 	}
 	if($withinDays > 0) {
-		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . "<DATE_ADD(CURRENT_DATE(), INTERVAL " . $withinDays . " DAY)";
+		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . "<DATE_ADD(CURRENT_DATE(), INTERVAL " . $withinDays . " DAY)";
 	}
 	if($type >= 0) {
 		$queryWhere = $queryWhere . " AND " . TABLE_MODULE . DOT . TABLE_MODULE_TYPE . "=" . $type;
 	}
-	$queryOrder = " ORDER BY " . TABLE_MODULE . DOT . TABLE_MODULE_END_DATE . " ASC";
+	$queryOrder = " ORDER BY " . TABLE_MODULE . DOT . TABLE_MODULE_STICKY . " DESC, " . TABLE_MODULE . DOT . TABLE_MODULE_EVENT_DATE . " ASC";
 	$queryFetch = "";
 	if($nbModules > 0) {
 		$queryFetch = " LIMIT " . $nbModules;
@@ -281,8 +305,12 @@ function get_module($nbModules, $openedOnly, $withinDays, $type) {
 		$module = array ();
 		$module[MODULE_ID] = $line[TABLE_MODULE_ID];
 		$module[MODULE_TITLE] = $line[TABLE_MODULE_TITLE];
-		$module[MODULE_END_DATE] = $line[TABLE_MODULE_END_DATE];
+		$module[MODULE_DESCRIPTION] = $line[TABLE_MODULE_DESCRIPTION];
+		$module[MODULE_AVAILABLE] = $line[TABLE_MODULE_AVAILABLE];
+		$module[MODULE_EVENT_DATE] = $line[TABLE_MODULE_EVENT_DATE];
+		$module[MODULE_REGISTER_END_DATE] = $line[TABLE_MODULE_REGISTER_END_DATE];
 		$module[MODULE_TYPE] = $line[TABLE_MODULE_TYPE];
+		$module[MODULE_STICKY] = $line[TABLE_MODULE_STICKY];
 		$modules[] = $module;
 	}
 

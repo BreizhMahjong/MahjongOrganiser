@@ -1,14 +1,18 @@
-<table style="border: 0px; width: 864px">
+<table style="border: 0px; width: 960px">
 	<tr>
-		<td style="text-align: right; width: 144px; padding: 8px">Type :</td>
-		<td style="text-align: center; width: 144px; padding: 8px"><select style="width: 128px" id="moduleType">
+		<td style="text-align: right; width: 160px; padding: 8px">Type :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><select style="width: 128px" id="moduleType">
 				<option value="0" selected>Séance</option>
 				<option value="1">Événement</option>
 		</select></td>
-		<td style="text-align: right; width: 144px; padding: 8px">Date :</td>
-		<td style="text-align: center; width: 144px; padding: 8px"><input style="width: 128px" id="moduleDate" type="date"></td>
-		<td style="text-align: right; width: 144px; padding: 8px">Options :</td>
-		<td style="text-align: center; width: 144px; padding: 8px"><select style="width: 128px" id="moduleOptions">
+		<td style="text-align: right; width: 160px; padding: 8px">Date :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><input style="width: 128px" id="moduleDate" type="date" onchange="dateChanged()"></td>
+		<td style="text-align: right; width: 160px; padding: 8px">Fin d'inscription :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><input style="width: 128px" id="moduleRegisterDate" type="date" onchange="registerDateChanged()"></td>
+	</tr>
+	<tr>
+		<td style="text-align: right; width: 160px; padding: 8px">Nombre d'options :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><select style="width: 128px" id="moduleOptions">
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
@@ -18,13 +22,21 @@
 				<option value="7">7</option>
 				<option value="8" selected>8</option>
 		</select></td>
+		<td style="text-align: right; width: 160px; padding: 8px">Nombre de places :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><input style="width: 128px" id="moduleAvailable" type="number" min="0" max="128" value="0"></td>
+		<td style="text-align: right; width: 160px; padding: 8px">Mise en avant :</td>
+		<td style="text-align: center; width: 160px; padding: 8px"><input style="float: left" id="moduleSticky" type="checkbox"></td>
 	</tr>
 	<tr>
-		<td style="text-align: right; width: 144px; padding: 8px">Titre :</td>
-		<td colspan="5" style="text-align: center; width: 720px; padding: 8px"><input style="width: 100%" id="moduleTitle" type="text" maxlength="128"></td>
+		<td style="text-align: right; width: 160px; padding: 8px">Titre :</td>
+		<td colspan="5" style="text-align: center; width: 800px; padding: 8px"><input style="width: 100%" id="moduleTitle" type="text" maxlength="128"></td>
+	</tr>
+	<tr>
+		<td style="text-align: right; width: 160px; padding: 8px">Description :</td>
+		<td colspan="5" style="text-align: center; width: 800px; height: 150px; padding: 8px"><textarea id="moduleDescription" maxlength="2048" style="width: 100%; height: 100%; resize: none"></textarea></td>
 	</tr>
 </table>
-<table style="border: 0px; width: 576px; margin-bottom: 32px">
+<table style="border: 0px; width: 640px; margin-bottom: 32px">
 	<tr style="display: table-row" id="optionLine1">
 		<td style="text-align: right; width: 25%; padding: 8px">Option 1 :</td>
 		<td style="text-align: center; width: 75%; padding: 8px"><input style="width: 100%" id="moduleOption1" type="text" maxlength="32"></td>
@@ -58,7 +70,7 @@
 		<td style="text-align: center; width: 75%; padding: 8px"><input style="width: 100%" id="moduleOption8" type="text" maxlength="32"></td>
 	</tr>
 </table>
-<table style="border: 0px; width: 576px">
+<table style="border: 0px; width: 640px">
 	<tr>
 		<td style="width: 20%"></td>
 		<td style="width: 20%"><input style="width: 100%" id="buttonCreate" type="button" value="Créer"></td>

@@ -11,28 +11,25 @@
 	display: table;
 	border: 1px solid grey;
 	cursor: pointer;
-	background: #F8FFF8;
-}
-
-.div-module-title-date {
-	display: table-cell;
-	width: 300px;
-	height: 48px;
-	padding: 12px 16px 12px 16px;
-}
-
-.div-module-title-date-closed {
-	display: table-cell;
-	width: 300px;
-	height: 48px;
-	padding: 12px 16px 12px 16px;
-	color: #FF0000;
 }
 
 .div-module-title-title {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
 	display: table-cell;
 	height: 48px;
-	padding: 12px 16px 12px 16px;
+	padding: 12px 8px 12px 8px;
+}
+
+.div-module-title-title-closed {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	display: table-cell;
+	height: 48px;
+	padding: 12px 8px 12px 8px;
+	color: #FF0000;
 }
 
 .div-module-title-icon {
@@ -44,6 +41,14 @@
 
 .div-module-foldable {
 	width: 100%;
+}
+
+.div-module-description {
+	width: 100%;
+	display: table;
+	border: 1px solid grey;
+	padding: 12px 16px 12px 16px;
+	text-align: justify;
 }
 
 .div-module-part {
@@ -62,10 +67,17 @@
 	width: 60px;
 }
 
-.div-module-part-left-nbpart-cell {
+.div-module-part-left-nbpart-cell-normal {
 	width: 60px;
 	height: 48px;
-	padding: 16px;
+	padding: 16px 8px 16px 8px;
+}
+
+.div-module-part-left-nbpart-cell-overbooked {
+	width: 60px;
+	height: 48px;
+	padding: 16px 8px 16px 8px;
+	color: red;
 }
 
 .div-module-part-left-option-col {
