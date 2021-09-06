@@ -4,6 +4,7 @@
 		<td style="text-align: center; width: 160px; padding: 8px"><select style="width: 128px" id="moduleType">
 				<option value="0" selected>Séance</option>
 				<option value="1">Événement</option>
+				<option value="2">Sondage</option>
 		</select></td>
 		<td style="text-align: right; width: 160px; padding: 8px">Date :</td>
 		<td style="text-align: center; width: 160px; padding: 8px"><input style="width: 128px" id="moduleDate" type="date" onchange="dateChanged()"></td>

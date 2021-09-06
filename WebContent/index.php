@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Breizh Mahjong Voutch</title>
-<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
-<link href="css/modulestyle.css" rel="stylesheet">
+<link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/modulestyle.css">
+
 <link rel="icon" type="image/png" href="images/calendar.png">
 
 </head>
@@ -38,9 +39,9 @@ if(isset($_GET["menu"])) {
 	$menu = $_GET["menu"];
 	if(!$isLogin && !$isAdmin && $menu !== "meeting") {
 		$menu = "meeting";
-	} else if($isLogin && !$isAdmin && $menu !== "meeting" && $menu !== "event") {
+	} else if($isLogin && !$isAdmin && $menu !== "poll" && $menu !== "event" && $menu !== "meeting") {
 		$menu = "meeting";
-	} else if($isLogin && $isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "event" && $menu !== "meeting") {
+	} else if($isLogin && $isAdmin && $menu !== "create" && $menu !== "modify" && $menu !== "poll" && $menu !== "event" && $menu !== "meeting") {
 		$menu = "meeting";
 	}
 } else {
@@ -64,29 +65,45 @@ if(isset($_GET["menu"])) {
 							if($menu === "create") {
 								echo "<li class=\"active\"><a href=\"?menu=create\">Créer</a></li>";
 								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
 							} else if($menu === "modify") {
 								echo "<li><a href=\"?menu=create\">Créer</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
+								echo "<li><a href=\"?menu=event\">Événement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "poll") {
+								echo "<li><a href=\"?menu=create\">Créer</a></li>";
+								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li class=\"active\"><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
 							} else if($menu === "event") {
 								echo "<li><a href=\"?menu=create\">Créer</a></li>";
 								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
 							} else if($menu === "meeting") {
 								echo "<li><a href=\"?menu=create\">Créer</a></li>";
 								echo "<li><a href=\"?menu=modify\">Modifier</a></li>";
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
 						} else if($isLogin) {
 							if($menu === "event") {
+								echo "<li class=\"active\"><a href=\"?menu=poll\">Sondage</a></li>";
+								echo "<li><a href=\"?menu=event\">Evenement</a></li>";
+								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
+							} else if($menu === "event") {
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=event\">Evenement</a></li>";
 								echo "<li><a href=\"?menu=meeting\">Séance</a></li>";
 							} else if($menu === "meeting") {
+								echo "<li><a href=\"?menu=poll\">Sondage</a></li>";
 								echo "<li><a href=\"?menu=event\">Événement</a></li>";
 								echo "<li class=\"active\"><a href=\"?menu=meeting\">Séance</a></li>";
 							}
@@ -136,7 +153,7 @@ if(isset($_GET["menu"])) {
 		</nav>
 		<div id="content">
 			<?php
-			if($menu === "meeting" || $menu === "event") {
+			if($menu === "meeting" || $menu === "event" || $menu === "poll") {
 				include ("page_php/display.php");
 			} else {
 				include ("page_php/" . $menu . ".php");
@@ -173,6 +190,7 @@ if(isset($_GET["menu"])) {
 
 	<script type="text/javascript" src="lib/jquery-1.12.3.min.js"></script>
 	<script type="text/javascript" src="lib/jquery.leanModal.min.js"></script>
+	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="page_js/main.js"></script>
 	<?php
 	if($isAdmin) {
@@ -185,6 +203,9 @@ if(isset($_GET["menu"])) {
 			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
 		} else if($menu === "event") {
 			echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else if($menu === "poll") {
+			echo "<script type=\"text/javascript\">var moduleTypeConst=2</script>";
 			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
 		} else {
 			echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";
@@ -201,6 +222,11 @@ if(isset($_GET["menu"])) {
 			echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
 			echo "<script type=\"text/javascript\">var moduleWithinDaysConst=0</script>";
 			echo "<script type=\"text/javascript\">var moduleTypeConst=1</script>";
+			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
+		} else if($menu === "poll") {
+			echo "<script type=\"text/javascript\">var moduleLimitConst=0</script>";
+			echo "<script type=\"text/javascript\">var moduleWithinDaysConst=0</script>";
+			echo "<script type=\"text/javascript\">var moduleTypeConst=2</script>";
 			echo "<script type=\"text/javascript\" src=\"page_js/display.js\"></script>";
 		} else {
 			echo "<script type=\"text/javascript\" src=\"page_js/" . $menu . ".js\"></script>";

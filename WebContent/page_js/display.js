@@ -320,11 +320,12 @@ function createModuleTable(module, moduleIndex, hue) {
 			
 			var subTitle;
 			if (module.type == 0) {
-				subTitle = "Séance " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". ";
+				subTitle = "Séance " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". Inscription avant " + moduleRegisterDate.toLocaleDateString("fr-fr", dateOptions) + ".<br>";
 			} else if(module.type == 1) {
-				subTitle = "Événement " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". ";
+				subTitle = "Événement " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ". Inscription avant " + moduleRegisterDate.toLocaleDateString("fr-fr", dateOptions) + ".<br>";
+			} else if(module.type == 2) {
+				subTitle = "Sondage à répondre avant " + moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + ".<br>";
 			}
-			subTitle = subTitle + "Inscription avant " + moduleRegisterDate.toLocaleDateString("fr-fr", dateOptions) + ".<br>";
 			
 			if (module.description != null && module.description != "") {
 				subTitle = subTitle + "Description : " + module.description;
