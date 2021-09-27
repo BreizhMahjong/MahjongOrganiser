@@ -95,6 +95,3 @@
 		<td style="width: 20%; padding: 8px"></td>
 	</tr>
 </table>
-<div class="loadingImage">
-	<img src="images/rolling.gif" />
-</div>

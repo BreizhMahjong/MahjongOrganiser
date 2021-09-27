@@ -230,7 +230,6 @@ function purgeClosedModules() {
 }
 
 function getModules() {
-	showLoading();
 	$.ajax({
 		url: SERVER_QUERY_URL,
 		type: "POST",
@@ -256,7 +255,6 @@ function getModules() {
 				option.innerHTML = moduleEventDate.toLocaleDateString("fr-fr", dateOptions) + " : " + modules[index].title;
 				selectModule.appendChild(option);
 			}
-			hideLoading();
 
 			selectModule.selectedIndex = 0;
 			displayModule();

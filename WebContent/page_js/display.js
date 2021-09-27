@@ -8,8 +8,9 @@ var moduleElements;
 function getDisplayOptionIcon(option) {
 	switch (option) {
 	case 3:
-	case 2:
 		return "images/question-24.png";
+	case 2:
+		return "images/heart-24.png";
 	case 1:
 		return "images/checked-24.png";
 	case 0:
@@ -21,8 +22,9 @@ function getDisplayOptionIcon(option) {
 function getChoiceOptionIcon(option) {
 	switch (option) {
 	case 3:
-	case 2:
 		return "images/question-24.png";
+	case 2:
+		return "images/heart-24.png";
 	case 1:
 		return "images/checked-24.png";
 	case 0:
@@ -31,8 +33,17 @@ function getChoiceOptionIcon(option) {
 	}
 }
 
+function toggleNbPartsDisplay(moduleIndex) {
+	moduleElements[moduleIndex].displayNbPartTextSimple = !moduleElements[moduleIndex].displayNbPartTextSimple;
+	var textNbParts = moduleElements[moduleIndex].displayNbPartTextSimple ? moduleElements[moduleIndex].nbPartsTextSimple : moduleElements[moduleIndex].nbPartsTextComplete;
+	var index;
+	for (index = 0; index < moduleElements[moduleIndex].nbParts.length; index++) {
+		moduleElements[moduleIndex].nbParts[index].innerHTML = textNbParts[index];
+	}
+}
+
 function toggleOption(moduleIndex, optionIndex) {
-	moduleElements[moduleIndex].options[optionIndex] = (moduleElements[moduleIndex].options[optionIndex] + 1) % 3;
+	moduleElements[moduleIndex].options[optionIndex] = (moduleElements[moduleIndex].options[optionIndex] + 1) % 4;
 	moduleElements[moduleIndex].optionImages[optionIndex].src = getChoiceOptionIcon(moduleElements[moduleIndex].options[optionIndex]);
 }
 
@@ -82,6 +93,7 @@ function prepareEditParticipation(moduleIndex, partIndex) {
 	for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
 		moduleElements[moduleIndex].options[optionIndex] = (module.parts[partIndex].participation >> (optionIndex * 2)) & 3;
 		moduleElements[moduleIndex].optionImages[optionIndex].src = getChoiceOptionIcon(moduleElements[moduleIndex].options[optionIndex]);
+		moduleElements[moduleIndex].optionImages[optionIndex].style.display = "";
 	}
 	
 	moduleElements[moduleIndex].addParticipationButton.style.display = "none";
@@ -127,19 +139,22 @@ function saveModifyParticipation(moduleIndex) {
 function cancelModifyParticipation(moduleIndex) {
 	var module = modules[moduleIndex];
 	moduleElements[moduleIndex].partName.value = "";
-	moduleElements[moduleIndex].partName.removeAttribute("disabled");
 	
-	var optionIndex;
-	for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
-		moduleElements[moduleIndex].options[optionIndex] = 0;
-		moduleElements[moduleIndex].optionImages[optionIndex].src = getChoiceOptionIcon(moduleElements[moduleIndex].options[optionIndex]);
-	}
-	
-	if (moduleElement.register_open) {
+	var optionIndex;	
+	if (moduleElements[moduleIndex].register_open) {
+		moduleElements[moduleIndex].partName.removeAttribute("disabled");
+		for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
+			moduleElements[moduleIndex].options[optionIndex] = 0;
+			moduleElements[moduleIndex].optionImages[optionIndex].src = getChoiceOptionIcon(moduleElements[moduleIndex].options[optionIndex]);
+		}
 		moduleElements[moduleIndex].addParticipationButton.style.display = "";
 	} else {
-		moduleElements[moduleIndex].addParticipationButton.style.display = "none";
+		for (optionIndex = 0; optionIndex < module.options.length; optionIndex++) {
+			moduleElements[moduleIndex].options[optionIndex] = 0;
+			moduleElements[moduleIndex].optionImages[optionIndex].src = getDisplayOptionIcon(moduleElements[moduleIndex].options[optionIndex]);
+		}
 	}
+	
 	moduleElements[moduleIndex].saveModifyParticipationButton.style.display = "none";
 	moduleElements[moduleIndex].cancelModifyParticipationButton.style.display = "none";
 }
@@ -264,40 +279,53 @@ function createModuleTable(module, moduleIndex, hue) {
 	
 	var participations = new Array();
 	var participationsOption = new Array();
+	var participationsFavorite = new Array();
 	var participationsMaybe = new Array();
 	for (index = 0; index < module.options.length; index++) {
 		var participation = new Array();
 		var participationOption = 0;
+		var participationFavorite = 0;
 		var participationMaybe = 0;
 		for (index2 = 0; index2 < module.parts.length; index2++) {
 			var participationValue = (module.parts[index2].participation >> (index * 2)) & 3;
 			participation.push(participationValue);
-			if (participationValue == 1) {
-				participationOption++;
-			} else if (participationValue == 2 || participationValue == 3) {
-				participationMaybe++;
+			switch (participationValue) {
+				case 1:
+					participationOption++;
+					break;
+				case 2:
+					participationOption++;
+					participationFavorite++;
+					break;
+				case 3:		
+					participationMaybe++;
+					break;
+				default:
+					break;
 			}
 		}
 		participations.push(participation);
 		participationsOption.push(participationOption);
+		participationsFavorite.push(participationFavorite);
 		participationsMaybe.push(participationMaybe);
 	}
 	
 	var moduleEventDate = new Date(module.event_date);
-	var moduleRegisterDate = new Date(module.register_end_date);
+	var moduleRegisterDate = new Date(module.register_end_date);	
 	moduleElement.register_open = moduleRegisterDate.getTime() >= today.getTime();
 	
 	var divModule = document.createElement("div");
-	divModule.className = "div-module"; {
+	divModule.className = "div-module";
+	
+	{
 		var divModuleTitle = document.createElement("div");
 		divModule.appendChild(divModuleTitle);
 		divModuleTitle.className = "div-module-title";
 		divModuleTitle.style.background = "hsl(" + hue + ", 100%, 95%)";
-		divModuleTitle.addEventListener("click", (function (constModuleId) {
-				return function () {
-					toggleModuleBody(constModuleId);
-				}
-			})(module.id));
+//		divModuleTitle.addEventListener("click", (function (constModuleId) {
+//				return function () {
+//					toggleModuleBody(constModuleId);
+//				}
 		
 		var divModuleTitleTitle = document.createElement("div");
 		divModuleTitle.appendChild(divModuleTitleTitle);
@@ -318,26 +346,28 @@ function createModuleTable(module, moduleIndex, hue) {
 			divModuleTitleTitle.className = "div-module-title-title";
 		}
 		
-		var divModuleTitleIcon = document.createElement("div");
-		divModuleTitle.appendChild(divModuleTitleIcon);
-		divModuleTitleIcon.className = "div-module-title-icon";
+//		var divModuleTitleIcon = document.createElement("div");
+//		divModuleTitle.appendChild(divModuleTitleIcon);
+//		divModuleTitleIcon.className = "div-module-title-icon";
 		
-		var divModuleTitleIconImg = document.createElement("img");
-		divModuleTitleIcon.appendChild(divModuleTitleIconImg);
-		divModuleTitleIconImg.id = "icon_" + module.id;
-		divModuleTitleIconImg.src = "images/arrowdown.png";
-		divModuleTitleIconImg.width = "16";
-		divModuleTitleIconImg.height = "16";
+//		var divModuleTitleIconImg = document.createElement("img");
+//		divModuleTitleIcon.appendChild(divModuleTitleIconImg);
+//		divModuleTitleIconImg.id = "icon_" + module.id;
+//		divModuleTitleIconImg.src = "images/arrowdown.png";
+//		divModuleTitleIconImg.width = "16";
+//		divModuleTitleIconImg.height = "16";
 	}
 	
 	{
-		var divModuleFoldable = document.createElement("div");
-		divModule.appendChild(divModuleFoldable);
-		divModuleFoldable.className = "div-module-foldable";
-		divModuleFoldable.id = "div_" + module.id;
-		divModuleFoldable.style.display = "none"; {
+//		var divModuleFoldable = document.createElement("div");
+//		divModule.appendChild(divModuleFoldable);
+//		divModuleFoldable.className = "div-module-foldable";
+//		divModuleFoldable.id = "div_" + module.id;
+		
+		{
 			var divModuleDescription = document.createElement("div");
-			divModuleFoldable.appendChild(divModuleDescription);
+//			divModuleFoldable.appendChild(divModuleDescription);
+			divModule.appendChild(divModuleDescription);
 			divModuleDescription.className = "div-module-description";
 			divModuleDescription.style.background = "hsl(" + (hue + 30) + ", 100%, 90%)";
 			
@@ -358,7 +388,8 @@ function createModuleTable(module, moduleIndex, hue) {
 		
 		{
 			var divModulePart = document.createElement("div");
-			divModuleFoldable.appendChild(divModulePart);
+//			divModuleFoldable.appendChild(divModulePart);
+			divModule.appendChild(divModulePart);
 			divModulePart.className = "div-module-part";
 			divModulePart.style.background = "hsl(" + (hue + 30) + ", 100%, 95%)";
 			divModulePart.style.height = ((module.options.length + 2) * 48 + 20) + "px";
@@ -442,16 +473,32 @@ function createModuleTable(module, moduleIndex, hue) {
 			divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalSpaceTop);
 			divModulePartLeftTotalSpaceTop.className = "div-module-part-left-nbpart-cell-normal";
 			
+			var moduleElementNbParts = new Array();
+			var textNbPartsSimple = new Array();
+			var textNbPartsComplete = new Array();
 			if (module.available == 0) {
 				for (index = 0; index < module.options.length; index++) {
 					var divModulePartLeftTotalOption = document.createElement("div");
 					divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalOption);
 					divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-normal";
-					if (participationsMaybe[index] > 0) {
-						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString() + "+" + participationsMaybe[index].toString();
-					} else {
-						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString();
+					divModulePartLeftTotalOption.addEventListener("click", (function (constModuleIndex) {
+						return function () {
+							toggleNbPartsDisplay(constModuleIndex);
+						}
+					})(moduleIndex));
+					moduleElementNbParts.push(divModulePartLeftTotalOption);
+					
+					var textNbPartSimple = participationsOption[index].toString();
+					var textNbPartComplete = participationsOption[index].toString();
+					if (participationsFavorite[index] > 0) {
+						textNbPartComplete = textNbPartComplete + " (" + participationsFavorite[index].toString() + ")";
 					}
+					if (participationsMaybe[index] > 0) {
+						textNbPartComplete = textNbPartComplete + " + " + participationsMaybe[index].toString();
+					} 
+					textNbPartsSimple.push(textNbPartSimple);
+					textNbPartsComplete.push(textNbPartComplete);
+					divModulePartLeftTotalOption.innerHTML = textNbPartSimple;
 				}
 			} else {
 				for (index = 0; index < module.options.length; index++) {
@@ -459,13 +506,35 @@ function createModuleTable(module, moduleIndex, hue) {
 					divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalOption);
 					if (participationsOption[index] > module.available) {
 						divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-overbooked";
-						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString() + " / " + module.available.toString();
 					} else {
 						divModulePartLeftTotalOption.className = "div-module-part-left-nbpart-cell-normal";
-						divModulePartLeftTotalOption.innerHTML = participationsOption[index].toString() + " / " + module.available.toString();
 					}
+					divModulePartLeftTotalOption.addEventListener("click", (function (constModuleIndex) {
+						return function () {
+							toggleNbPartsDisplay(constModuleIndex);
+						}
+					})(moduleIndex));
+					moduleElementNbParts.push(divModulePartLeftTotalOption);
+
+					var textNbPartSimple = participationsOption[index].toString();
+					var textNbPartComplete = participationsOption[index].toString();
+					if (participationsFavorite[index] > 0) {
+						textNbPartComplete = textNbPartComplete + " (" + participationsFavorite[index].toString() + ")";
+					}
+					if (participationsMaybe[index] > 0) {
+						textNbPartComplete = textNbPartComplete + " + " + participationsMaybe[index].toString();
+					}
+					textNbPartSimple = textNbPartSimple + " / " + module.available.toString();
+					textNbPartComplete = textNbPartComplete + " / " + module.available.toString();
+					textNbPartsSimple.push(textNbPartSimple);
+					textNbPartsComplete.push(textNbPartComplete);
+					divModulePartLeftTotalOption.innerHTML = textNbPartSimple;
 				}
 			}
+			moduleElement.nbParts = moduleElementNbParts;
+			moduleElement.displayNbPartTextSimple = true;
+			moduleElement.nbPartsTextSimple = textNbPartsSimple;
+			moduleElement.nbPartsTextComplete = textNbPartsComplete;
 			
 			divModulePartLeftTotalSpaceBottom = document.createElement("div");
 			divModulePartLeftTotalCol.appendChild(divModulePartLeftTotalSpaceBottom);
@@ -503,6 +572,9 @@ function createModuleTable(module, moduleIndex, hue) {
 			divModulePartLeftNewPartNameInput.type = "text";
 			divModulePartLeftNewPartNameInput.maxlength = "16";
 			divModulePartLeftNewPartNameInput.style = "width: 100%";
+			if (!moduleElement.register_open) {
+				divModulePartLeftNewPartNameInput.setAttribute("disabled", "true");
+			}
 			
 			moduleElement.partName = divModulePartLeftNewPartNameInput;
 			
@@ -515,16 +587,18 @@ function createModuleTable(module, moduleIndex, hue) {
 				
 				var divModulePartLeftNewPartOptionImg = document.createElement("img");
 				divModulePartLeftNewPartOption.appendChild(divModulePartLeftNewPartOptionImg);
+				divModulePartLeftNewPartOptionImg.src = getChoiceOptionIcon(0);
 				divModulePartLeftNewPartOptionImg.width = "24";
 				divModulePartLeftNewPartOptionImg.height = "24";
-				divModulePartLeftNewPartOptionImg.src = getChoiceOptionIcon(0);
-				
 				divModulePartLeftNewPartOptionImg.addEventListener("click", (function (constModuleIndex, constOptionIndex) {
 						return function () {
 							toggleOption(constModuleIndex, constOptionIndex);
 						}
 					})(moduleIndex, index));
-				
+				if (!moduleElement.register_open) {
+					divModulePartLeftNewPartOptionImg.style.display = "none";
+				}
+
 				moduleElementOptions.push(0);
 				moduleElementOptionImages.push(divModulePartLeftNewPartOptionImg);
 			}
@@ -542,14 +616,14 @@ function createModuleTable(module, moduleIndex, hue) {
 			divModulePartLeftNewPartIconImg.height = "16";
 			divModulePartLeftNewPartIconImg.style.cursor = "pointer";
 			divModulePartLeftNewPartIconImg.style.margin = "0px 8px";
-			if (!moduleElement.register_open) {
-				divModulePartLeftNewPartIconImg.style.display = "none";
-			}
 			divModulePartLeftNewPartIconImg.addEventListener("click", (function (constModuleIndex) {
 					return function () {
 						addParticipation(constModuleIndex);
 					}
 				})(moduleIndex));
+			if (!moduleElement.register_open) {
+				divModulePartLeftNewPartIconImg.style.display = "none";
+			}
 			moduleElement.addParticipationButton = divModulePartLeftNewPartIconImg;
 			
 			var divModulePartLeftModifyPartIconImg = document.createElement("img");
@@ -585,7 +659,8 @@ function createModuleTable(module, moduleIndex, hue) {
 		
 		{
 			var divModuleComment = document.createElement("div");
-			divModuleFoldable.appendChild(divModuleComment);
+//			divModuleFoldable.appendChild(divModuleComment);
+			divModule.appendChild(divModuleComment);
 			divModuleComment.className = "div-module-comment";
 			
 			var tableModuleCommentInnerTable = document.createElement("table");
@@ -693,7 +768,6 @@ function createModuleTable(module, moduleIndex, hue) {
 }
 
 function getModules() {
-	showLoading();
 	$.ajax({
 		url: SERVER_QUERY_URL,
 		type: "POST",
@@ -739,11 +813,10 @@ function getModules() {
 					var table = createModuleTable(module, index, hue);
 					newModulePanel.appendChild(table);
 				}
+				var windowY = window.scrollY;
 				modulePanel.parentNode.replaceChild(newModulePanel, modulePanel);
-				
-				toggleModuleBody(modules[0].id)
+				window.scroll(0, windowY);
 			}
-			hideLoading();
 		}
 	});
 }

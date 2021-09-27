@@ -10,7 +10,6 @@
 	width: 100%;
 	display: table;
 	border: 1px solid grey;
-	cursor: pointer;
 }
 
 .div-module-title-title {
@@ -64,19 +63,21 @@
 
 .div-module-part-left-nbpart-col {
 	float: left;
-	width: 60px;
+	width: 90px;
 }
 
 .div-module-part-left-nbpart-cell-normal {
-	width: 60px;
+	width: 90px;
 	height: 48px;
-	padding: 16px 8px 16px 8px;
+	padding: 16px 0px 16px 0px;
+	cursor: pointer;
 }
 
 .div-module-part-left-nbpart-cell-overbooked {
-	width: 60px;
+	width: 90px;
 	height: 48px;
-	padding: 16px 8px 16px 8px;
+	padding: 16px 0px 16px 0px;
+	cursor: pointer;
 	color: red;
 }
 
@@ -93,11 +94,11 @@
 
 .div-module-part-left-newpart-col {
 	float: left;
-	width: 180px;
+	width: 150px;
 }
 
 .div-module-part-left-newpart-cell {
-	width: 180px;
+	width: 150px;
 	height: 48px;
 	padding: 12px;
 }

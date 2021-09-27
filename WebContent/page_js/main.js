@@ -26,18 +26,6 @@ function logoutEvent() {
 	});
 }
 
-function showLoading() {
-	$(".table").hide();
-	$(".chart").hide();
-	$(".loadingImage").show();
-}
-
-function hideLoading() {
-	$(".table").show();
-	$(".chart").show();
-	$(".loadingImage").hide();
-}
-
 $(document).ready(function() {
 	$(".nav li.disabled a").click(function() {
 		return false;
