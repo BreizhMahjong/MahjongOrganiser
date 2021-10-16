@@ -1,5 +1,5 @@
 CREATE TABLE bmjs_module (
-	id						integer unsigned not null auto_increment,
+	id						integer unsigned not null,
 	title					varchar(128) not null,
 	description				varchar(2048),
 	available				integer unsigned not null,

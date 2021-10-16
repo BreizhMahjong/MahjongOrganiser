@@ -28,9 +28,22 @@ function new_module($module) {
 					$register_end_date = $event_date;
 				}
 
+				$query = "SELECT " . TABLE_MODULE_ID . " FROM " . TABLE_MODULE;
+				$queryResult = executeQuery($query, null);
+				$existingIds = array ();
+				foreach ($queryResult as $line) {
+					$existingIds [] = intval ($line [TABLE_MODULE_ID]);
+				}
+				if (empty ($existingIds)) {
+					$id = 1;
+				} else {
+					$id = min (array_diff (range (1, max ($existingIds) + 1), $existingIds));
+				}
+
 				beginTransaction();
-				$query = "INSERT INTO " . TABLE_MODULE . "(" . TABLE_MODULE_TITLE . ", " . TABLE_MODULE_DESCRIPTION . ", " . TABLE_MODULE_AVAILABLE . ", " . TABLE_MODULE_EVENT_DATE . ", " . TABLE_MODULE_REGISTER_END_DATE . ", " . TABLE_MODULE_TYPE . ", " . TABLE_MODULE_STICKY . ") VALUES(?, ?, ?, ?, ?, ?, ?)";
+				$query = "INSERT INTO " . TABLE_MODULE . "(" . TABLE_MODULE_ID . ", " . TABLE_MODULE_TITLE . ", " . TABLE_MODULE_DESCRIPTION . ", " . TABLE_MODULE_AVAILABLE . ", " . TABLE_MODULE_EVENT_DATE . ", " . TABLE_MODULE_REGISTER_END_DATE . ", " . TABLE_MODULE_TYPE . ", " . TABLE_MODULE_STICKY . ") VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 				$parameters = array (
+					$id,
 					$title,
 					$description,
 					$available,
@@ -40,8 +53,8 @@ function new_module($module) {
 					$sticky
 				);
 
-				$id = executeInsert($query, $parameters);
-				if($id > 0) {
+				$idAdded = executeUpdate($query, $parameters);
+				if($idAdded) {
 					$optionAddError = false;
 					foreach($options as $option) {
 						if(!empty($option)) {

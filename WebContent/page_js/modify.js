@@ -151,8 +151,6 @@ function duplicateModule() {
 		for (index = 0; index < module.options.length; index++) {
 			module.options[index].title = elementInputOptions[index].value;
 		}
-		
-		console.log(module);
 
 		$.ajax({
 			url: SERVER_QUERY_URL,

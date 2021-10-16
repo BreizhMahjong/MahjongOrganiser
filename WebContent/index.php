@@ -184,11 +184,11 @@ if(isset($_GET["menu"])) {
 				<p id="loginError"></p>
 				<label for="loginInput">Identifiant : </label>
 				<div class="input-group">
-					<input id="loginInput" type="text" class="form-control" aria-describedby="basic-addon2" />
+					<input id="loginInput" type="text" autocomplete="username" class="form-control" aria-describedby="basic-addon2" />
 				</div>
 				<br /> <label for="passwordInput">Mot de passe : </label>
 				<div class="input-group">
-					<input id="passwordInput" type="password" class="form-control" aria-describedby="basic-addon2" />
+					<input id="passwordInput" type="password" autocomplete="current-password" class="form-control" aria-describedby="basic-addon2" />
 				</div>
 				<br />
 				<button id="validateLoginButton" type="button" class="btn btn-primary" onclick="loginEvent()" aria-label="Left Align">Se connecter</button>
